@@ -615,6 +615,30 @@ local function makeCard(parent, name, size, pos, bg, radius)
 end
 
 -- ─────────────────────────────────────────────────────────────────
+-- 6b. ABBREVIATION DECODER (reverse of Bnum.short())
+-- ─────────────────────────────────────────────────────────────────
+local shortU8   = {"", "U", "D", "T", "Qd", "Qn", "Sx", "Sp", "Oc", "No"}
+local shortU9   = {"", "De", "Vg", "Tg", "qg", "Qg", "sg", "Sg", "Og", "Ng"}
+local shortU10  = {"", "Ce", "Du", "Tr", "Qa", "Qi", "Se", "Si", "Ot", "Ni"}
+
+local suffixToExp = {}
+do
+    local function genSuffix(v6)
+        if v6 == 0 then return "K" end
+        if v6 == 1 then return "M" end
+        if v6 == 2 then return "B" end
+        local ones  = (v6 % 10) + 1
+        local tens  = (math.floor(v6 / 10) % 10) + 1
+        local hunds = (math.floor(v6 / 100) % 10) + 1
+        return shortU10[hunds] .. shortU9[tens] .. shortU8[ones]
+    end
+    for v6 = 0, 999 do
+        local s = genSuffix(v6)
+        suffixToExp[s] = v6 * 3 + 3
+    end
+end
+
+-- ─────────────────────────────────────────────────────────────────
 -- 7.  HOME TAB
 -- ─────────────────────────────────────────────────────────────────
 local HomeTab = make("Frame", ContentArea, {
@@ -2523,50 +2547,6 @@ for id, def in pairs(NavButtons) do
             tween(def.txt, FAST, { TextColor3 = C.TEXT_SUB })
         end
     end)
-end
-
--- ─────────────────────────────────────────────────────────────────
--- 11b. ABBREVIATION DECODER (reverse of Bnum.short())
--- ─────────────────────────────────────────────────────────────────
-local shortU8   = {"", "U", "D", "T", "Qd", "Qn", "Sx", "Sp", "Oc", "No"}
-local shortU9   = {"", "De", "Vg", "Tg", "qg", "Qg", "sg", "Sg", "Og", "Ng"}
-local shortU10  = {"", "Ce", "Du", "Tr", "Qa", "Qi", "Se", "Si", "Ot", "Ni"}
-
-local suffixToExp = {}
-do
-    local function genSuffix(v6)
-        if v6 == 0 then return "K" end
-        if v6 == 1 then return "M" end
-        if v6 == 2 then return "B" end
-        local ones  = (v6 % 10) + 1
-        local tens  = (math.floor(v6 / 10) % 10) + 1
-        local hunds = (math.floor(v6 / 100) % 10) + 1
-        return shortU10[hunds] .. shortU9[tens] .. shortU8[ones]
-    end
-    for v6 = 0, 999 do
-        local s = genSuffix(v6)
-        suffixToExp[s] = v6 * 3 + 3
-    end
-end
-
-local function decodeAbbr(str)
-    if not str or str == "" then return nil end
-    str = string.upper(str)
-    local numPart, suffix = str:match("^(%d+%.?%d*)([%a]*)$")
-    if not numPart then return nil end
-    local num = tonumber(numPart)
-    if not num then return nil end
-    if suffix == nil or suffix == "" then return num end
-    local exp = suffixToExp[suffix]
-    if not exp then return nil end
-    return num * (10 ^ exp)
-end
-
-local function valOrDecodeAbbr(str)
-    if not str or str == "" then return nil end
-    local n = tonumber(str)
-    if n then return n end
-    return decodeAbbr(str)
 end
 
 -- ─────────────────────────────────────────────────────────────────
