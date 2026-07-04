@@ -1210,13 +1210,11 @@ make("TextLabel", Row3, {
     TextXAlignment   = Enum.TextXAlignment.Left,
     TextYAlignment   = Enum.TextYAlignment.Center,
 })
-local bfUpdateSwitch  -- forward-declared for mutual exclusion callback
+local bfUpdateSwitch       -- forward-declared for mutual exclusion
+local updateRebirthSwitch   -- forward-declared
+local updateRebirthBuySwitch -- forward-declared
 local updateAutoFarmSwitch = createToggleSwitch(Row3, _G.ButtonAutofarm, function(newState, triggerUpdate)
     _G.ButtonAutofarm = newState
-    if newState and _G.ButtonFarmToggle then
-        _G.ButtonFarmToggle = false
-        if bfUpdateSwitch then bfUpdateSwitch(false) end
-    end
     triggerUpdate(_G.ButtonAutofarm)
 end)
 
@@ -1257,8 +1255,12 @@ make("TextLabel", Row1, {
     TextXAlignment   = Enum.TextXAlignment.Left,
     TextYAlignment   = Enum.TextYAlignment.Center,
 })
-createToggleSwitch(Row1, _G.RebirthToggle, function(newState, triggerUpdate)
+updateRebirthSwitch = createToggleSwitch(Row1, _G.RebirthToggle, function(newState, triggerUpdate)
     _G.RebirthToggle = newState
+    if newState and _G.ButtonFarmToggle then
+        _G.ButtonFarmToggle = false
+        if bfUpdateSwitch then bfUpdateSwitch(false) end
+    end
     triggerUpdate(_G.RebirthToggle)
 end)
 
@@ -1277,10 +1279,13 @@ make("TextLabel", Row2, {
     TextXAlignment   = Enum.TextXAlignment.Left,
     TextYAlignment   = Enum.TextYAlignment.Center,
 })
-createToggleSwitch(Row2, _G.RebirthBuyToggle, function(newState, triggerUpdate)
+updateRebirthBuySwitch = createToggleSwitch(Row2, _G.RebirthBuyToggle, function(newState, triggerUpdate)
     _G.RebirthBuyToggle = newState
+    if newState and _G.ButtonFarmToggle then
+        _G.ButtonFarmToggle = false
+        if bfUpdateSwitch then bfUpdateSwitch(false) end
+    end
     if not newState then
-        -- reset the scrolling priority index so next enable starts at choice 1
         _G.RebirthCurrentIndex = 1
     end
     triggerUpdate(_G.RebirthBuyToggle)
@@ -1664,9 +1669,15 @@ make("TextLabel", BFRow, {
 })
 bfUpdateSwitch = createToggleSwitch(BFRow, _G.ButtonFarmToggle, function(newState, triggerUpdate)
     _G.ButtonFarmToggle = newState
-    if newState and _G.ButtonAutofarm then
-        _G.ButtonAutofarm = false
-        if updateAutoFarmSwitch then updateAutoFarmSwitch(false) end
+    if newState then
+        if _G.RebirthToggle then
+            _G.RebirthToggle = false
+            if updateRebirthSwitch then updateRebirthSwitch(false) end
+        end
+        if _G.RebirthBuyToggle then
+            _G.RebirthBuyToggle = false
+            if updateRebirthBuySwitch then updateRebirthBuySwitch(false) end
+        end
     end
     triggerUpdate(newState)
 end)
