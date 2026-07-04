@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.5                       ║
+    ║                     BRITE HUB  v4.6.6                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.5 Custom",
+    Text             = "v4.6.6 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -971,7 +971,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.5",
+    " Running BriteHub Build v4.6.6",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -2717,6 +2717,8 @@ end)
 
 -- Auto Progress Loop Thread
 task.spawn(function()
+    local apSMCooldown = false
+    local apPreCooldown = false
     while true do
         if _G.AutoProgressToggle then
             pcall(function()
@@ -2724,7 +2726,7 @@ task.spawn(function()
                 local root = char and char:FindFirstChild("HumanoidRootPart")
                 if not root then return end
 
-                -- 1. Super Multiply
+                -- 1. Super Multiply (fire once until target reached)
                 if _G.AutoSuperMultiplyToggle then
                     local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Super Multi Get")
                     if btn then
@@ -2732,13 +2734,16 @@ task.spawn(function()
                         local gives = scriptObj and scriptObj:FindFirstChild("UpgradesMultiMulti")
                         local currentVal = gives and tonumber(gives.Value) or 0
                         local target = valOrDecodeAbbr(_G.AutoSuperMultiplyNumber) or 1
-                        if currentVal < target then
+                        if currentVal >= target then
+                            apSMCooldown = false
+                        elseif not apSMCooldown then
+                            apSMCooldown = true
                             fireTouch(btn)
                         end
                     end
                 end
 
-                -- 2. Prestige
+                -- 2. Prestige (fire once until target reached)
                 if _G.AutoPrestigeToggle then
                     local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Prestige Get")
                     if btn then
@@ -2746,7 +2751,10 @@ task.spawn(function()
                         local ppText = upper and upper:FindFirstChild("TextLabel")
                         local pp = ppText and tonumber(ppText.Text:match("%+([%d%.]+)")) or 0
                         local target = tonumber(_G.AutoPrestigeNumber) or 2
-                        if pp ~= nil and pp < target then
+                        if pp ~= nil and pp >= target then
+                            apPreCooldown = false
+                        elseif pp ~= nil and pp < target and not apPreCooldown then
+                            apPreCooldown = true
                             fireTouch(btn)
                         end
                     end
