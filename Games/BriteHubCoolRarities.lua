@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.3.6                       ║
+    ║                     BRITE HUB  v4.3.8                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.3.6 Custom",
+    Text             = "v4.3.8 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -971,7 +971,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.3.6",
+    " Running BriteHub Build v4.3.8",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1205,21 +1205,32 @@ local apPreInput = make("TextBox", apPreRow, {
 corner(apPreInput, 5)
 stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
 
-apPreInput.FocusLost:Connect(function(enterPressed)
-    local raw = apPreInput.Text:match("^%s*(.-)%s*$")
-    if raw and raw ~= "" then
-        local num = tonumber(raw)
-        if num and num >= 1 then
-            local r = math.floor(num / 2 + 0.5) * 2
-            if r < 2 then r = 2 end
-            _G.AutoPrestigeNumber = tostring(r)
-            apPreInput.Text = tostring(r)
-            task.delay(0.2, function() apPreInput.Text = tostring(r) end)
-        else
-            apPreInput.Text = _G.AutoPrestigeNumber
+apPreInput.FocusLost:Connect(function()
+    local num = tonumber(apPreInput.Text:match("^%s*(.-)%s*$"))
+    if num and num >= 1 then
+        local r = math.floor(num / 2 + 0.5) * 2
+        if r < 2 then r = 2 end
+        _G.AutoPrestigeNumber = tostring(r)
+        apPreInput.Text = tostring(r)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.3)
+        if apPreInput and not apPreInput:IsFocused() then
+            local cur = apPreInput.Text
+            local num = tonumber(cur:match("^%s*(.-)%s*$"))
+            if num and num >= 1 then
+                local r = math.floor(num / 2 + 0.5) * 2
+                if r < 2 then r = 2 end
+                local rs = tostring(r)
+                if rs ~= cur then
+                    _G.AutoPrestigeNumber = rs
+                    apPreInput.Text = rs
+                end
+            end
         end
-    else
-        apPreInput.Text = _G.AutoPrestigeNumber
     end
 end)
 
