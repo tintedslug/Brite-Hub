@@ -1210,6 +1210,7 @@ make("TextLabel", Row3, {
     TextXAlignment   = Enum.TextXAlignment.Left,
     TextYAlignment   = Enum.TextYAlignment.Center,
 })
+local bfUpdateSwitch  -- forward-declared for mutual exclusion callback
 local updateAutoFarmSwitch = createToggleSwitch(Row3, _G.ButtonAutofarm, function(newState, triggerUpdate)
     _G.ButtonAutofarm = newState
     if newState and _G.ButtonFarmToggle then
@@ -1646,8 +1647,6 @@ end
 if #ButtonFarmData == 0 then
     table.insert(ButtonFarmData, {btn=nil, name="None", req=0, raw="0;0", text="(None)"})
 end
-
-local bfUpdateSwitch
 
 -- Button Farm Master toggle
 local BFRow = makeCard(BFScroll, "ButtonFarmRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
