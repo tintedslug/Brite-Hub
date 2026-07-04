@@ -1884,16 +1884,13 @@ task.spawn(function()
                             for i = 1, #choices do
                                 local idx = ((offset + i - 2) % #choices) + 1
                                 local choice = choices[idx]
-                                local upg
-                                if choice == "1" then
-                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
-                                elseif choice == "2" then
-                                    upg = findRightColumnBtn("Rebirth Upgrade 5")
-                                elseif choice == "3" then
-                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
-                                elseif choice == "4" then
-                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 7")
-                                end
+                                local BTN_NAMES = {
+                                    ["1"] = "Rebirth Upgrade11",
+                                    ["2"] = "Rebirth Upgrade 5",
+                                    ["3"] = "Rebirth Upgrade 6",
+                                    ["4"] = "Rebirth Upgrade 7",
+                                }
+                                local upg = findRightColumnBtn(BTN_NAMES[choice])
                                 if upg then fireTouch(upg) end
                             end
                             _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
