@@ -1869,8 +1869,7 @@ task.spawn(function()
                                 if choice == "1" then
                                     upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
                                 elseif choice == "2" then
-                                    local kids = workspace.Buttons:GetChildren()
-                                    upg = kids[25]
+                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 5")
                                 elseif choice == "3" then
                                     upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
                                 elseif choice == "4" then
