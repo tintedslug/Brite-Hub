@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v2.5                         ║
+    ║                     BRITE HUB  v4.2.3                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -1445,10 +1445,17 @@ KeyBtn2.Activated:Connect(function()
 end)
 
 -- ─────────────────────────────────────────────────────────────────
---  Rune Farm Card
+--  Rune Farm + Button Farm Cards
 -- ─────────────────────────────────────────────────────────────────
-local RuneFarmCard = makeCard(FarmTab, "RuneFarmCard", UDim2.new(1, 0, 0, 520), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
-RuneFarmCard.LayoutOrder = 2
+local FarmRow2 = make("Frame", FarmTab, {
+    Name = "FarmRow2",
+    Size = UDim2.new(1, 0, 0, 400),
+    BackgroundTransparency = 1,
+    LayoutOrder = 2,
+})
+
+-- ── Rune Farm Card (left) ─────────────────────────────────────
+local RuneFarmCard = makeCard(FarmRow2, "RuneFarmCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
 stroke(RuneFarmCard, 1, C.BORDER_GLOW, 0.5)
 
 make("TextLabel", RuneFarmCard, {
@@ -1488,7 +1495,6 @@ make("UIPadding", RuneScroll, {
     PaddingRight = UDim.new(0, 10),
 })
 
--- Master toggle
 local MasterRow = makeCard(RuneScroll, "MasterRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
 MasterRow.LayoutOrder = 1
 make("TextLabel", MasterRow, {
@@ -1567,7 +1573,48 @@ RuneKeyBtn.Activated:Connect(function()
     RuneKeyBtn.TextColor3 = C.TEXT_SUB
 end)
 
--- ── Button Farm Data ──────────────────────────────────────────
+-- ── Button Farm Card (right) ──────────────────────────────────
+local ButtonFarmCard = makeCard(FarmRow2, "ButtonFarmCard", UDim2.new(0.5, -3, 1, 0), UDim2.new(0.5, 3, 0, 0), C.BG_CARD, 12)
+stroke(ButtonFarmCard, 1, C.BORDER_GLOW, 0.5)
+
+make("TextLabel", ButtonFarmCard, {
+    Name = "ButtonFarmHeader",
+    Size = UDim2.new(1, -20, 0, 32),
+    Position = UDim2.new(0, 14, 0, 8),
+    BackgroundTransparency = 1,
+    Text = "Button Farm",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ZIndex = 5,
+})
+
+local BFScroll = make("ScrollingFrame", ButtonFarmCard, {
+    Size = UDim2.new(1, -16, 1, -48),
+    Position = UDim2.new(0, 8, 0, 40),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    ScrollBarThickness = 4,
+    ScrollBarImageColor3 = C.ACCENT_PURPLE,
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+})
+make("UIListLayout", BFScroll, {
+    FillDirection = Enum.FillDirection.Vertical,
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 8),
+})
+make("UIPadding", BFScroll, {
+    PaddingTop = UDim.new(0, 4),
+    PaddingBottom = UDim.new(0, 12),
+    PaddingLeft = UDim.new(0, 4),
+    PaddingRight = UDim.new(0, 10),
+})
+
+-- Button Farm data collection
 local ButtonFarmData = {}
 do
     local allButtons = workspace.Buttons:GetChildren()
@@ -1599,11 +1646,10 @@ if #ButtonFarmData == 0 then
 end
 
 local bfUpdateSwitch
-local bfUpdateSmart
 
 -- Button Farm Master toggle
-local BFRow = makeCard(RuneScroll, "ButtonFarmRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-BFRow.LayoutOrder = 7
+local BFRow = makeCard(BFScroll, "ButtonFarmRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFRow.LayoutOrder = 1
 make("TextLabel", BFRow, {
     Size = UDim2.new(0, 200, 1, 0),
     Position = UDim2.new(0, 12, 0, 0),
@@ -1621,8 +1667,8 @@ bfUpdateSwitch = createToggleSwitch(BFRow, _G.ButtonFarmToggle, function(newStat
 end)
 
 -- Smart Button toggle
-local SmartRow = makeCard(RuneScroll, "SmartButtonRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-SmartRow.LayoutOrder = 8
+local SmartRow = makeCard(BFScroll, "SmartButtonRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+SmartRow.LayoutOrder = 2
 make("TextLabel", SmartRow, {
     Size = UDim2.new(0, 200, 1, 0),
     Position = UDim2.new(0, 12, 0, 0),
@@ -1634,14 +1680,14 @@ make("TextLabel", SmartRow, {
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Center,
 })
-bfUpdateSmart = createToggleSwitch(SmartRow, _G.SmartButtonToggle, function(newState, triggerUpdate)
+createToggleSwitch(SmartRow, _G.SmartButtonToggle, function(newState, triggerUpdate)
     _G.SmartButtonToggle = newState
     triggerUpdate(newState)
 end)
 
 -- Dropdown row
-local BFDropdownRow = makeCard(RuneScroll, "BFDropdownRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-BFDropdownRow.LayoutOrder = 9
+local BFDropdownRow = makeCard(BFScroll, "BFDropdownRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFDropdownRow.LayoutOrder = 3
 BFDropdownRow.ClipsDescendants = false
 
 local bfDropdownHeader = make("TextButton", BFDropdownRow, {
@@ -1731,8 +1777,8 @@ bfDropdownHeader.Activated:Connect(function()
 end)
 
 -- Button Farm keybind row
-local BFKeyRow = makeCard(RuneScroll, "BFKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-BFKeyRow.LayoutOrder = 10
+local BFKeyRow = makeCard(BFScroll, "BFKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFKeyRow.LayoutOrder = 4
 make("TextLabel", BFKeyRow, {
     Size = UDim2.new(0, 140, 1, 0),
     Position = UDim2.new(0, 12, 0, 0),
