@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.0                       ║
+    ║                     BRITE HUB  v4.6.1                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.0 Custom",
+    Text             = "v4.6.1 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -971,7 +971,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.0",
+    " Running BriteHub Build v4.6.1",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1220,8 +1220,9 @@ local function apPreRound()
         _G.AutoPrestigeNumber = rs
         apPreInput.Text = ""
         apPreInput.Text = rs
-        apPreInput.TextColor3 = C.ACCENT_PINK
-        task.delay(0.8, function() apPreInput.TextColor3 = C.TEXT_PRIMARY end)
+        local par = apPreInput.Parent
+        apPreInput.Parent = nil
+        apPreInput.Parent = par
     end
 end
 
