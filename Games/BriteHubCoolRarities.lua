@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.4                       ║
+    ║                     BRITE HUB  v4.6.5                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.4 Custom",
+    Text             = "v4.6.5 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -630,11 +630,11 @@ do
         local ones  = (v6 % 10) + 1
         local tens  = (math.floor(v6 / 10) % 10) + 1
         local hunds = (math.floor(v6 / 100) % 10) + 1
-        return shortU10[hunds] .. shortU9[tens] .. shortU8[ones]
+        return shortU8[ones] .. shortU9[tens] .. shortU10[hunds]
     end
     for v6 = 0, 999 do
         local s = genSuffix(v6)
-        suffixToExp[s] = v6 * 3 + 3
+        suffixToExp[string.upper(s)] = v6 * 3 + 3
     end
 end
 
@@ -971,7 +971,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.4",
+    " Running BriteHub Build v4.6.5",
 }
 
 for _, entry in ipairs(cleanEntries) do
