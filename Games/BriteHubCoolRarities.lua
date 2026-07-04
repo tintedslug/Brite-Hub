@@ -302,7 +302,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v3.3.0 Custom",
+    Text             = "v4.0.0 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -924,7 +924,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v3.3.0",
+    " Running BriteHub Build v4.0.0",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1853,31 +1853,34 @@ task.spawn(function()
                 end
                 if _G.RebirthBuyToggle and _G.RebirthSequence ~= "" then
                     local choices = {}
-                    for choice in string.gmatch(_G.RebirthSequence, "([^,]+)") do
-                        table.insert(choices, string.gsub(choice, "%s+", ""))
+                    for choice in string.gmatch(_G.RebirthSequence, "[^,]+") do
+                        local trimmed = choice:match("^%s*(.-)%s*$")
+                        if trimmed and trimmed ~= "" then
+                            table.insert(choices, trimmed)
+                        end
                     end
 
                     if #choices > 0 then
-                        local choice = choices[_G.RebirthCurrentIndex] or choices[1]
-                        local btn
-                        if choice == "1" then
-                            btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
-                        elseif choice == "2" then
-                            local kids = workspace.Buttons:GetChildren()
-                            btn = kids[25]
-                        elseif choice == "3" then
-                            btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
-                        elseif choice == "4" then
-                            btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 7")
-                        end
-
-                        if btn then
-                            fireTouch(btn)
-                            -- Advance to next index for next cycle
-                            _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
-                            if _G.RebirthCurrentIndex > #choices then
-                                _G.RebirthCurrentIndex = 1
+                        local offset = ((_G.RebirthCurrentIndex - 1) % #choices) + 1
+                        for i = 1, #choices do
+                            local idx = ((offset + i - 2) % #choices) + 1
+                            local choice = choices[idx]
+                            local btn
+                            if choice == "1" then
+                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
+                            elseif choice == "2" then
+                                local kids = workspace.Buttons:GetChildren()
+                                btn = kids[25]
+                            elseif choice == "3" then
+                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
+                            elseif choice == "4" then
+                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 7")
                             end
+                            if btn then fireTouch(btn) end
+                        end
+                        _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
+                        if _G.RebirthCurrentIndex > #choices then
+                            _G.RebirthCurrentIndex = 1
                         end
                     end
                 end
