@@ -58,6 +58,12 @@ _G.RuneBaseluckToggle  = false
 _G.RunePrestigeToggle  = false
 _G.RuneFarmKeybind     = "Y"
 
+-- Button Farm
+_G.ButtonFarmToggle      = false
+_G.SmartButtonToggle     = false
+_G.ButtonFarmKeybind     = "-"
+_G.ButtonFarmSelectionIdx = 1
+
 -- GUI & Teleport Keybinds
 _G.GuiToggleKeybind  = "RightShift"
 _G.TpRollKeybind     = "R"
@@ -1441,7 +1447,7 @@ end)
 -- ─────────────────────────────────────────────────────────────────
 --  Rune Farm Card
 -- ─────────────────────────────────────────────────────────────────
-local RuneFarmCard = makeCard(FarmTab, "RuneFarmCard", UDim2.new(1, 0, 0, 270), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
+local RuneFarmCard = makeCard(FarmTab, "RuneFarmCard", UDim2.new(1, 0, 0, 520), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
 RuneFarmCard.LayoutOrder = 2
 stroke(RuneFarmCard, 1, C.BORDER_GLOW, 0.5)
 
@@ -1561,6 +1567,224 @@ RuneKeyBtn.Activated:Connect(function()
     RuneKeyBtn.TextColor3 = C.TEXT_SUB
 end)
 
+-- ── Button Farm Data ──────────────────────────────────────────
+local ButtonFarmData = {}
+do
+    local allButtons = workspace.Buttons:GetChildren()
+    for _, btn in ipairs(allButtons) do
+        local s = btn:FindFirstChild("Script")
+        local r = s and s:FindFirstChild("Requiredrarity")
+        if r then
+            local raw = r.Value
+            local a, b = raw:match("^(%d+);(.+)$")
+            if a and b then
+                local base = tonumber(a)
+                local exp = tonumber(b:match("^%d+"))
+                local val
+                if base == 0 then val = exp else val = base * (10 ^ #b) end
+                if val and val > 0 then
+                    local up3 = btn:FindFirstChild("Up3")
+                    local tl = up3 and up3:FindFirstChild("TextLabel")
+                    local text = tl and tl.Text or btn.Name
+                    table.insert(ButtonFarmData, {btn=btn, name=btn.Name, req=val, raw=raw, text=text})
+                end
+            end
+        end
+    end
+    table.sort(ButtonFarmData, function(a,b) return a.req < b.req end)
+end
+
+if #ButtonFarmData == 0 then
+    table.insert(ButtonFarmData, {btn=nil, name="None", req=0, raw="0;0", text="(None)"})
+end
+
+local bfUpdateSwitch
+local bfUpdateSmart
+
+-- Button Farm Master toggle
+local BFRow = makeCard(RuneScroll, "ButtonFarmRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFRow.LayoutOrder = 7
+make("TextLabel", BFRow, {
+    Size = UDim2.new(0, 200, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Button Farm",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+bfUpdateSwitch = createToggleSwitch(BFRow, _G.ButtonFarmToggle, function(newState, triggerUpdate)
+    _G.ButtonFarmToggle = newState
+    triggerUpdate(newState)
+end)
+
+-- Smart Button toggle
+local SmartRow = makeCard(RuneScroll, "SmartButtonRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+SmartRow.LayoutOrder = 8
+make("TextLabel", SmartRow, {
+    Size = UDim2.new(0, 200, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Smart Button",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+bfUpdateSmart = createToggleSwitch(SmartRow, _G.SmartButtonToggle, function(newState, triggerUpdate)
+    _G.SmartButtonToggle = newState
+    triggerUpdate(newState)
+end)
+
+-- Dropdown row
+local BFDropdownRow = makeCard(RuneScroll, "BFDropdownRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFDropdownRow.LayoutOrder = 9
+BFDropdownRow.ClipsDescendants = false
+
+local bfDropdownHeader = make("TextButton", BFDropdownRow, {
+    Size = UDim2.new(1, -16, 0, 30),
+    Position = UDim2.new(0, 8, 0, 7),
+    BackgroundColor3 = C.BG_CARD,
+    Text = ButtonFarmData[_G.ButtonFarmSelectionIdx] and ButtonFarmData[_G.ButtonFarmSelectionIdx].text or "Rare",
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 11,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextTruncate = Enum.TextTruncate.AtEnd,
+    Active = true,
+    ZIndex = 10,
+})
+corner(bfDropdownHeader, 5)
+stroke(bfDropdownHeader, 1, C.BORDER_GLOW, 0.4)
+
+local BFDropdownList = make("ScrollingFrame", BFDropdownRow, {
+    Size = UDim2.new(1, -16, 0, 0),
+    Position = UDim2.new(0, 8, 0, 40),
+    BackgroundColor3 = C.BG_CARD,
+    BorderSizePixel = 0,
+    Visible = false,
+    ZIndex = 15,
+    ScrollBarThickness = 6,
+    ScrollBarImageColor3 = C.ACCENT_PURPLE,
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+})
+corner(BFDropdownList, 5)
+stroke(BFDropdownList, 1, C.BORDER_GLOW, 0.6)
+
+make("UIListLayout", BFDropdownList, {
+    FillDirection = Enum.FillDirection.Vertical,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 2),
+})
+make("UIPadding", BFDropdownList, {
+    PaddingTop = UDim.new(0, 4),
+    PaddingBottom = UDim.new(0, 4),
+    PaddingLeft = UDim.new(0, 4),
+    PaddingRight = UDim.new(0, 4),
+})
+
+local function closeBFDropdown()
+    BFDropdownList.Visible = false
+    BFDropdownRow.Size = UDim2.new(1, 0, 0, 44)
+end
+
+local bfDropdownBtns = {}
+for i, data in ipairs(ButtonFarmData) do
+    local item = make("TextButton", BFDropdownList, {
+        Size = UDim2.new(1, 0, 0, 24),
+        BackgroundColor3 = C.BG_CARD2,
+        Text = data.text,
+        TextColor3 = i == _G.ButtonFarmSelectionIdx and C.ACCENT_PINK or C.TEXT_PRIMARY,
+        Font = Enum.Font.Gotham,
+        TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        Active = true,
+        ZIndex = 16,
+        LayoutOrder = i,
+    })
+    corner(item, 3)
+    item.Activated:Connect(function()
+        _G.ButtonFarmSelectionIdx = i
+        bfDropdownHeader.Text = data.text
+        closeBFDropdown()
+        for _, b in ipairs(bfDropdownBtns) do b.TextColor3 = C.TEXT_PRIMARY end
+        item.TextColor3 = C.ACCENT_PINK
+    end)
+    table.insert(bfDropdownBtns, item)
+end
+
+bfDropdownHeader.Activated:Connect(function()
+    if BFDropdownList.Visible then
+        closeBFDropdown()
+    else
+        BFDropdownList.Visible = true
+        local itemCount = math.min(#ButtonFarmData, 8)
+        local ddHeight = itemCount * 26 + 10
+        BFDropdownList.Size = UDim2.new(1, -16, 0, ddHeight)
+        BFDropdownRow.Size = UDim2.new(1, 0, 0, 44 + ddHeight + 4)
+    end
+end)
+
+-- Button Farm keybind row
+local BFKeyRow = makeCard(RuneScroll, "BFKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+BFKeyRow.LayoutOrder = 10
+make("TextLabel", BFKeyRow, {
+    Size = UDim2.new(0, 140, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Button Farm Hotkey:",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+local BFKeyBtn = make("TextButton", BFKeyRow, {
+    Size = UDim2.new(0, 120, 0, 26),
+    Position = UDim2.new(0, 160, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.ButtonFarmKeybind,
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    Active = true,
+})
+corner(BFKeyBtn, 5)
+stroke(BFKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
+BFKeyBtn.Activated:Connect(function()
+    _G.captureTarget = BFKeyBtn
+    _G.captureCallback = function(k) _G.ButtonFarmKeybind = k end
+    BFKeyBtn.Text = "..."
+    BFKeyBtn.TextColor3 = C.TEXT_SUB
+end)
+
+-- Smart Button: find best match below player rarity
+local function getSmartButtonTarget()
+    local pd = LocalPlayer and LocalPlayer:FindFirstChild("PlayerData")
+    local rs = pd and pd:FindFirstChild("Rarity")
+    if not rs then return nil end
+    local raw = rs.Value
+    local a, b = raw:match("^(%d+);(.+)$")
+    if not a then return nil end
+    local base = tonumber(a)
+    local exp = tonumber(b:match("^%d+"))
+    if not exp then return nil end
+    local playerVal
+    if base == 0 then playerVal = exp else playerVal = base * (10 ^ #b) end
+    if not playerVal then return nil end
+    local best
+    for _, data in ipairs(ButtonFarmData) do
+        if data.req <= playerVal then best = data end
+    end
+    return best
+end
+
 -- Keybind Processing Core Engine Connection
 UserInputService.InputBegan:Connect(function(input, processed)
     -- Block shiftlock from Right Shift when it's the GUI toggle key
@@ -1583,6 +1807,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
     elseif keyName == _G.RuneFarmKeybind then
         _G.RuneFarmMaster = not _G.RuneFarmMaster
         if updateRuneMaster then updateRuneMaster(_G.RuneFarmMaster) end
+        return
+    elseif keyName == _G.ButtonFarmKeybind then
+        _G.ButtonFarmToggle = not _G.ButtonFarmToggle
+        if bfUpdateSwitch then bfUpdateSwitch(_G.ButtonFarmToggle) end
         return
     elseif keyName == _G.GuiToggleKeybind then
         guiVisible = not guiVisible
@@ -2089,6 +2317,26 @@ task.spawn(function()
                             end
                         end
                     end
+                end
+            end)
+        end
+        task.wait(_G.FarmWaitTime)
+    end
+end)
+
+-- Button Farm Loop Thread
+task.spawn(function()
+    while true do
+        if _G.ButtonFarmToggle and #ButtonFarmData > 0 then
+            pcall(function()
+                local target
+                if _G.SmartButtonToggle then
+                    target = getSmartButtonTarget()
+                else
+                    target = ButtonFarmData[_G.ButtonFarmSelectionIdx]
+                end
+                if target and target.btn then
+                    fireTouch(target.btn)
                 end
             end)
         end
