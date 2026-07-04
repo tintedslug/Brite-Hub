@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.6                       ║
+    ║                     BRITE HUB  v4.6.7                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -46,7 +46,7 @@ _G.RebirthToggle     = false
 _G.RebirthBuyToggle  = false
 _G.RebirthSequence   = "1,2,3,4"
 
-_G.FarmWaitTime      = 0.01
+_G.FarmWaitTime      = 0.005
 _G.FarmKeybind       = "Comma"
 _G.AutoFarmKeybind   = "J"
 
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.6 Custom",
+    Text             = "v4.6.7 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -636,6 +636,30 @@ do
         local s = genSuffix(v6)
         suffixToExp[string.upper(s)] = v6 * 3 + 3
     end
+end
+
+local function decodeBnum(str)
+    if type(str) ~= "string" then return nil end
+    local m, e = str:match("^(-?[%d%.]+);([%d%.%-]+)$")
+    if m and e then
+        return tonumber(m) * (10 ^ tonumber(e))
+    end
+    return nil
+end
+
+local function valOrDecodeAbbr(str)
+    if str and str:match("^%d+$") then return tonumber(str) end
+    if type(str) ~= "string" then return nil end
+    local upper = string.upper(str)
+    local numPart, suffix = upper:match("^(%d+)([%a]+)$")
+    if numPart and suffix then
+        local num = tonumber(numPart)
+        local exp = suffixToExp[suffix]
+        if num and exp and num >= 1 then
+            return num * (10 ^ exp)
+        end
+    end
+    return nil
 end
 
 -- ─────────────────────────────────────────────────────────────────
@@ -971,7 +995,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.6",
+    " Running BriteHub Build v4.6.7",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -2730,9 +2754,9 @@ task.spawn(function()
                 if _G.AutoSuperMultiplyToggle then
                     local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Super Multi Get")
                     if btn then
-                        local scriptObj = btn:FindFirstChild("Script")
-                        local gives = scriptObj and scriptObj:FindFirstChild("UpgradesMultiMulti")
-                        local currentVal = gives and tonumber(gives.Value) or 0
+                        local pd = LocalPlayer and LocalPlayer:FindFirstChild("PlayerData")
+                        local smVal = pd and pd:FindFirstChild("UpgradesMultiMulti")
+                        local currentVal = smVal and decodeBnum(smVal.Value) or 0
                         local target = valOrDecodeAbbr(_G.AutoSuperMultiplyNumber) or 1
                         if currentVal >= target then
                             apSMCooldown = false
@@ -2747,13 +2771,13 @@ task.spawn(function()
                 if _G.AutoPrestigeToggle then
                     local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Prestige Get")
                     if btn then
-                        local upper = btn:FindFirstChild("Up2")
-                        local ppText = upper and upper:FindFirstChild("TextLabel")
-                        local pp = ppText and tonumber(ppText.Text:match("%+([%d%.]+)")) or 0
+                        local pd = LocalPlayer and LocalPlayer:FindFirstChild("PlayerData")
+                        local ppVal = pd and pd:FindFirstChild("PrestigePoints")
+                        local totalPP = ppVal and decodeBnum(ppVal.Value) or 0
                         local target = tonumber(_G.AutoPrestigeNumber) or 2
-                        if pp ~= nil and pp >= target then
+                        if totalPP >= target then
                             apPreCooldown = false
-                        elseif pp ~= nil and pp < target and not apPreCooldown then
+                        elseif not apPreCooldown then
                             apPreCooldown = true
                             fireTouch(btn)
                         end
