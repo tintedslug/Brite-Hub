@@ -69,7 +69,7 @@ _G.AutoProgressToggle      = false
 _G.AutoSuperMultiplyToggle = false
 _G.AutoSuperMultiplyNumber = "1m"
 _G.AutoPrestigeToggle      = false
-_G.AutoPrestigeNumber      = "1000"
+_G.AutoPrestigeNumber      = "2"
 _G.AutoAscendToggle        = false
 _G.AutoProgressKeybind     = "U"
 
@@ -1226,12 +1226,12 @@ apPreInput.FocusLost:Connect(function()
             local rounded = math.floor(okVal / 2 + 0.5) * 2
             if rounded < 2 then rounded = 2 end
             _G.AutoPrestigeNumber = tostring(rounded)
-            apPreInput.Text = tostring(rounded)
+            task.defer(function() apPreInput.Text = tostring(rounded) end)
         else
-            apPreInput.Text = _G.AutoPrestigeNumber
+            task.defer(function() apPreInput.Text = _G.AutoPrestigeNumber end)
         end
     else
-        apPreInput.Text = _G.AutoPrestigeNumber
+        task.defer(function() apPreInput.Text = _G.AutoPrestigeNumber end)
     end
 end)
 
