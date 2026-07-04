@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.7                       ║
+    ║                     BRITE HUB  v4.6.8                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.7 Custom",
+    Text             = "v4.6.8 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -995,7 +995,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.7",
+    " Running BriteHub Build v4.6.8",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1954,7 +1954,8 @@ make("UIPadding", BFScroll, {
 -- Button Farm data collection
 local ButtonFarmData = {}
 do
-    local allButtons = workspace.Buttons:GetChildren()
+    local buttonsFolder = workspace:FindFirstChild("Buttons")
+    local allButtons = buttonsFolder and buttonsFolder:GetChildren() or {}
     for _, btn in ipairs(allButtons) do
         local s = btn:FindFirstChild("Script")
         local r = s and s:FindFirstChild("Requiredrarity")
@@ -2177,6 +2178,7 @@ local function getSmartButtonTarget()
 end
 
 -- Keybind Processing Core Engine Connection
+local keyDebounce = {}
 UserInputService.InputBegan:Connect(function(input, processed)
     -- Block shiftlock from Right Shift when it's the GUI toggle key
     if input.KeyCode == Enum.KeyCode.RightShift then
@@ -2185,6 +2187,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
     if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 
     local keyName = input.KeyCode.Name
+
+    if keyDebounce[keyName] then return end
+    keyDebounce[keyName] = true
+    task.delay(0.15, function() keyDebounce[keyName] = false end)
 
     -- Farm / GUI toggle hotkeys — FIRST, before capture mode, so they never lag
     if keyName == _G.FarmKeybind then
@@ -2579,7 +2585,8 @@ local function fireTouch(part)
 end
 
 local function findRightColumnBtn(name)
-    local kids = workspace.Buttons:GetChildren()
+    local buttonsFolder = workspace:FindFirstChild("Buttons")
+    local kids = buttonsFolder and buttonsFolder:GetChildren() or {}
     local candidates = {}
     for _, v in ipairs(kids) do
         if v.Name == name then
@@ -2613,8 +2620,10 @@ task.spawn(function()
                     end
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
@@ -2626,16 +2635,13 @@ task.spawn(function()
                 local rollSystem = workspace:FindFirstChild("Roll System")
                 local rollPart = rollSystem and rollSystem:FindFirstChild("RollRarity")
                 if rollPart and rollPart:IsA("BasePart") then
-                    local char = LocalPlayer.Character
-                    local root = char and char:FindFirstChild("HumanoidRootPart")
-                    if root and typeof(firetouchinterest) == "function" then
-                        firetouchinterest(rollPart, root, 0)
-                        firetouchinterest(rollPart, root, 1)
-                    end
+                    fireTouch(rollPart)
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
@@ -2661,19 +2667,15 @@ task.spawn(function()
                         end
 
                         if #choices > 0 then
-                            local offset = ((_G.RebirthCurrentIndex - 1) % #choices) + 1
-                            for i = 1, #choices do
-                                local idx = ((offset + i - 2) % #choices) + 1
-                                local choice = choices[idx]
-                                local BTN_NAMES = {
-                                    ["1"] = "Rebirth Upgrade11",
-                                    ["2"] = "Rebirth Upgrade 5",
-                                    ["3"] = "Rebirth Upgrade 6",
-                                    ["4"] = "Rebirth Upgrade 7",
-                                }
-                                local upg = findRightColumnBtn(BTN_NAMES[choice])
-                                if upg then fireTouch(upg) end
-                            end
+                            local choice = choices[((_G.RebirthCurrentIndex - 1) % #choices) + 1]
+                            local BTN_NAMES = {
+                                ["1"] = "Rebirth Upgrade11",
+                                ["2"] = "Rebirth Upgrade 5",
+                                ["3"] = "Rebirth Upgrade 6",
+                                ["4"] = "Rebirth Upgrade 7",
+                            }
+                            local upg = findRightColumnBtn(BTN_NAMES[choice])
+                            if upg then fireTouch(upg) end
                             _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
                             if _G.RebirthCurrentIndex > #choices then
                                 _G.RebirthCurrentIndex = 1
@@ -2682,8 +2684,10 @@ task.spawn(function()
                     end
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
@@ -2703,19 +2707,15 @@ task.spawn(function()
                         local folder = workspace:FindFirstChild(folderName)
                         local part = folder and folder:FindFirstChild("RollRarity")
                         if part and part:IsA("BasePart") then
-                            local char = LocalPlayer.Character
-                            local root = char and char:FindFirstChild("HumanoidRootPart")
-                            if root and typeof(firetouchinterest) == "function" then
-                                firetouchinterest(part, root, 0)
-                                task.wait(0.01)
-                                firetouchinterest(part, root, 1)
-                            end
+                            fireTouch(part)
                         end
                     end
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
@@ -2734,8 +2734,10 @@ task.spawn(function()
                     fireTouch(target.btn)
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
@@ -2803,8 +2805,10 @@ task.spawn(function()
                     end
                 end
             end)
+            task.wait(_G.FarmWaitTime)
+        else
+            task.wait(1)
         end
-        task.wait(_G.FarmWaitTime)
     end
 end)
 
