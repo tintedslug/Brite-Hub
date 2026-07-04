@@ -1850,37 +1850,38 @@ task.spawn(function()
                 if _G.RebirthToggle then
                     local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Rebirth Get")
                     if btn then fireTouch(btn) end
-                end
-                if _G.RebirthBuyToggle and _G.RebirthSequence ~= "" then
-                    local choices = {}
-                    for choice in string.gmatch(_G.RebirthSequence, "[^,]+") do
-                        local trimmed = choice:match("^%s*(.-)%s*$")
-                        if trimmed and trimmed ~= "" then
-                            table.insert(choices, trimmed)
-                        end
-                    end
 
-                    if #choices > 0 then
-                        local offset = ((_G.RebirthCurrentIndex - 1) % #choices) + 1
-                        for i = 1, #choices do
-                            local idx = ((offset + i - 2) % #choices) + 1
-                            local choice = choices[idx]
-                            local btn
-                            if choice == "1" then
-                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
-                            elseif choice == "2" then
-                                local kids = workspace.Buttons:GetChildren()
-                                btn = kids[25]
-                            elseif choice == "3" then
-                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
-                            elseif choice == "4" then
-                                btn = workspace.Buttons:FindFirstChild("Rebirth Upgrade 7")
+                    if _G.RebirthBuyToggle and _G.RebirthSequence ~= "" then
+                        local choices = {}
+                        for choice in string.gmatch(_G.RebirthSequence, "[^,]+") do
+                            local trimmed = choice:match("^%s*(.-)%s*$")
+                            if trimmed and trimmed ~= "" then
+                                table.insert(choices, trimmed)
                             end
-                            if btn then fireTouch(btn) end
                         end
-                        _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
-                        if _G.RebirthCurrentIndex > #choices then
-                            _G.RebirthCurrentIndex = 1
+
+                        if #choices > 0 then
+                            local offset = ((_G.RebirthCurrentIndex - 1) % #choices) + 1
+                            for i = 1, #choices do
+                                local idx = ((offset + i - 2) % #choices) + 1
+                                local choice = choices[idx]
+                                local upg
+                                if choice == "1" then
+                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
+                                elseif choice == "2" then
+                                    local kids = workspace.Buttons:GetChildren()
+                                    upg = kids[25]
+                                elseif choice == "3" then
+                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
+                                elseif choice == "4" then
+                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 7")
+                                end
+                                if upg then fireTouch(upg) end
+                            end
+                            _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
+                            if _G.RebirthCurrentIndex > #choices then
+                                _G.RebirthCurrentIndex = 1
+                            end
                         end
                     end
                 end
