@@ -50,6 +50,13 @@ _G.FarmWaitTime      = 0.01
 _G.FarmKeybind       = "Comma"
 _G.AutoFarmKeybind   = "J"
 
+-- Rune Farm
+_G.RuneCloverToggle    = false
+_G.RunePlantToggle     = false
+_G.RuneBaseluckToggle  = false
+_G.RunePrestigeToggle  = false
+_G.RuneFarmKeybind     = "Y"
+
 -- GUI & Teleport Keybinds
 _G.GuiToggleKeybind  = "RightShift"
 _G.TpRollKeybind     = "R"
@@ -946,16 +953,39 @@ end
 -- ─────────────────────────────────────────────────────────────────
 -- 8.  FARM TAB
 -- ─────────────────────────────────────────────────────────────────
-local FarmTab = make("Frame", ContentArea, {
+local FarmTab = make("ScrollingFrame", ContentArea, {
     Name             = "FarmTab",
     Size             = UDim2.new(1, 0, 1, 0),
     Position         = UDim2.new(0, 0, 0, 0),
     BackgroundTransparency = 1,
     Visible          = false,
     ZIndex           = 3,
+    ScrollBarThickness = 4,
+    ScrollBarImageColor3 = C.ACCENT_PURPLE,
+    CanvasSize       = UDim2.new(0, 0, 0, 0),
+    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+})
+make("UIListLayout", FarmTab, {
+    FillDirection    = Enum.FillDirection.Vertical,
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder        = Enum.SortOrder.LayoutOrder,
+    Padding          = UDim.new(0, 8),
+})
+make("UIPadding", FarmTab, {
+    PaddingTop    = UDim.new(0, 4),
+    PaddingBottom = UDim.new(0, 12),
+    PaddingLeft   = UDim.new(0, 4),
+    PaddingRight  = UDim.new(0, 10),
 })
 
-local CloverCard = makeCard(FarmTab, "CloverCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
+local FarmCardRow = make("Frame", FarmTab, {
+    Name = "FarmCardRow",
+    Size = UDim2.new(1, 0, 0, 400),
+    BackgroundTransparency = 1,
+    LayoutOrder = 1,
+})
+
+local CloverCard = makeCard(FarmCardRow, "CloverCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
 stroke(CloverCard, 1, C.BORDER_GLOW, 0.5)
 
 local CloverHeaderLabel = make("TextLabel", CloverCard, {
@@ -997,7 +1027,7 @@ make("UIPadding", CloverScroll, {
     PaddingRight  = UDim.new(0, 10)
 })
 
-local AutoFarmCard = makeCard(FarmTab, "AutoFarmCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0.5, 6, 0, 0), C.BG_CARD, 12)
+local AutoFarmCard = makeCard(FarmCardRow, "AutoFarmCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0.5, 6, 0, 0), C.BG_CARD, 12)
 stroke(AutoFarmCard, 1, C.BORDER_GLOW, 0.5)
 
 local AutoFarmHeaderLabel = make("TextLabel", AutoFarmCard, {
@@ -1407,6 +1437,110 @@ KeyBtn2.Activated:Connect(function()
     KeyBtn2.TextColor3 = C.TEXT_SUB
 end)
 
+-- ─────────────────────────────────────────────────────────────────
+--  Rune Farm Card
+-- ─────────────────────────────────────────────────────────────────
+local RuneFarmCard = makeCard(FarmTab, "RuneFarmCard", UDim2.new(1, 0, 0, 270), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
+RuneFarmCard.LayoutOrder = 2
+stroke(RuneFarmCard, 1, C.BORDER_GLOW, 0.5)
+
+make("TextLabel", RuneFarmCard, {
+    Name = "RuneFarmHeader",
+    Size = UDim2.new(1, -20, 0, 32),
+    Position = UDim2.new(0, 14, 0, 8),
+    BackgroundTransparency = 1,
+    Text = "Rune Farm",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ZIndex = 5,
+})
+
+local RuneScroll = make("ScrollingFrame", RuneFarmCard, {
+    Size = UDim2.new(1, -16, 1, -48),
+    Position = UDim2.new(0, 8, 0, 40),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    ScrollBarThickness = 4,
+    ScrollBarImageColor3 = C.ACCENT_PURPLE,
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+})
+make("UIListLayout", RuneScroll, {
+    FillDirection = Enum.FillDirection.Vertical,
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 8),
+})
+make("UIPadding", RuneScroll, {
+    PaddingTop = UDim.new(0, 4),
+    PaddingBottom = UDim.new(0, 12),
+    PaddingLeft = UDim.new(0, 4),
+    PaddingRight = UDim.new(0, 10),
+})
+
+local runeUpdates = {}
+local function runeRow(name, layoutOrder)
+    local row = makeCard(RuneScroll, name.."Row", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+    row.LayoutOrder = layoutOrder
+    make("TextLabel", row, {
+        Size = UDim2.new(0, 200, 1, 0),
+        Position = UDim2.new(0, 12, 0, 0),
+        BackgroundTransparency = 1,
+        Text = name,
+        TextColor3 = C.TEXT_PRIMARY,
+        Font = Enum.Font.GothamMedium,
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Center,
+    })
+    local update = createToggleSwitch(row, _G["Rune"..name.."Toggle"], function(newState, triggerUpdate)
+        _G["Rune"..name.."Toggle"] = newState
+        triggerUpdate(newState)
+    end)
+    runeUpdates[name] = update
+end
+
+runeRow("Clover", 1)
+runeRow("Plant", 2)
+runeRow("Baseluck", 3)
+runeRow("Prestige", 4)
+
+local RuneKeyRow = makeCard(RuneScroll, "RuneKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+RuneKeyRow.LayoutOrder = 5
+make("TextLabel", RuneKeyRow, {
+    Size = UDim2.new(0, 140, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Rune Farm Hotkey:",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+local RuneKeyBtn = make("TextButton", RuneKeyRow, {
+    Size = UDim2.new(0, 120, 0, 26),
+    Position = UDim2.new(0, 160, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.RuneFarmKeybind,
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    Active = true,
+})
+corner(RuneKeyBtn, 5)
+stroke(RuneKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
+RuneKeyBtn.Activated:Connect(function()
+    _G.captureTarget = RuneKeyBtn
+    _G.captureCallback = function(k) _G.RuneFarmKeybind = k end
+    RuneKeyBtn.Text = "..."
+    RuneKeyBtn.TextColor3 = C.TEXT_SUB
+end)
+
 -- Keybind Processing Core Engine Connection
 UserInputService.InputBegan:Connect(function(input, processed)
     -- Block shiftlock from Right Shift when it's the GUI toggle key
@@ -1435,6 +1569,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
     elseif keyName == _G.AutoFarmKeybind then
         _G.ButtonAutofarm = not _G.ButtonAutofarm
         updateAutoFarmSwitch(_G.ButtonAutofarm)
+        return
+    elseif keyName == _G.RuneFarmKeybind then
+        _G.RuneCloverToggle = not _G.RuneCloverToggle
+        if runeUpdates.Clover then runeUpdates.Clover(_G.RuneCloverToggle) end
         return
     elseif keyName == _G.GuiToggleKeybind then
         guiVisible = not guiVisible
@@ -1896,6 +2034,38 @@ task.spawn(function()
                             _G.RebirthCurrentIndex = _G.RebirthCurrentIndex + 1
                             if _G.RebirthCurrentIndex > #choices then
                                 _G.RebirthCurrentIndex = 1
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(_G.FarmWaitTime)
+    end
+end)
+
+-- Rune Farm Loop Thread
+task.spawn(function()
+    local runePaths = {
+        Clover   = "runez",
+        Plant    = "runeth",
+        Baseluck = "runezzz",
+        Prestige = "runezz",
+    }
+    while true do
+        if _G.RuneCloverToggle or _G.RunePlantToggle or _G.RuneBaseluckToggle or _G.RunePrestigeToggle then
+            pcall(function()
+                for name, folderName in pairs(runePaths) do
+                    if _G["Rune"..name.."Toggle"] then
+                        local folder = workspace:FindFirstChild(folderName)
+                        local part = folder and folder:FindFirstChild("RollRarity")
+                        if part and part:IsA("BasePart") then
+                            local char = LocalPlayer.Character
+                            local root = char and char:FindFirstChild("HumanoidRootPart")
+                            if root and typeof(firetouchinterest) == "function" then
+                                firetouchinterest(part, root, 0)
+                                task.wait(0.01)
+                                firetouchinterest(part, root, 1)
                             end
                         end
                     end
