@@ -1212,8 +1212,10 @@ make("TextLabel", Row3, {
 })
 local updateAutoFarmSwitch = createToggleSwitch(Row3, _G.ButtonAutofarm, function(newState, triggerUpdate)
     _G.ButtonAutofarm = newState
-    -- explicitly: this toggle only manages Autofarm.
-    -- Turning it ON or OFF must never touch _G.AutoRoll.
+    if newState and _G.ButtonFarmToggle then
+        _G.ButtonFarmToggle = false
+        if bfUpdateSwitch then bfUpdateSwitch(false) end
+    end
     triggerUpdate(_G.ButtonAutofarm)
 end)
 
@@ -1663,6 +1665,10 @@ make("TextLabel", BFRow, {
 })
 bfUpdateSwitch = createToggleSwitch(BFRow, _G.ButtonFarmToggle, function(newState, triggerUpdate)
     _G.ButtonFarmToggle = newState
+    if newState and _G.ButtonAutofarm then
+        _G.ButtonAutofarm = false
+        if updateAutoFarmSwitch then updateAutoFarmSwitch(false) end
+    end
     triggerUpdate(newState)
 end)
 
