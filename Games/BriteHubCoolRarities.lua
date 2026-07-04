@@ -1205,33 +1205,21 @@ local apPreInput = make("TextBox", apPreRow, {
 corner(apPreInput, 5)
 stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
 
-apPreInput.FocusLost:Connect(function()
+apPreInput.FocusLost:Connect(function(enterPressed)
     local raw = apPreInput.Text:match("^%s*(.-)%s*$")
     if raw and raw ~= "" then
-        local okVal
-        if raw:match("^%d+$") then
-            okVal = tonumber(raw)
+        local num = tonumber(raw)
+        if num and num >= 1 then
+            local r = math.floor(num / 2 + 0.5) * 2
+            if r < 2 then r = 2 end
+            _G.AutoPrestigeNumber = tostring(r)
+            apPreInput.Text = tostring(r)
+            task.delay(0.2, function() apPreInput.Text = tostring(r) end)
         else
-            local upper = string.upper(raw)
-            local numPart, suffix = upper:match("^(%d+)([%a]+)$")
-            if numPart and suffix then
-                local num = tonumber(numPart)
-                local exp = suffixToExp[suffix]
-                if num and exp and num >= 1 then
-                    okVal = num * (10 ^ exp)
-                end
-            end
-        end
-        if okVal and okVal >= 1 then
-            local rounded = math.floor(okVal / 2 + 0.5) * 2
-            if rounded < 2 then rounded = 2 end
-            _G.AutoPrestigeNumber = tostring(rounded)
-            task.defer(function() apPreInput.Text = tostring(rounded) end)
-        else
-            task.defer(function() apPreInput.Text = _G.AutoPrestigeNumber end)
+            apPreInput.Text = _G.AutoPrestigeNumber
         end
     else
-        task.defer(function() apPreInput.Text = _G.AutoPrestigeNumber end)
+        apPreInput.Text = _G.AutoPrestigeNumber
     end
 end)
 
