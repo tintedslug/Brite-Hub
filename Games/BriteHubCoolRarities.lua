@@ -17,7 +17,7 @@ local StarterGui     = game:GetService("StarterGui")
 
 local LocalPlayer    = Players.LocalPlayer
 local PlayerName     = LocalPlayer and LocalPlayer.Name or "Player"
-local sessionStartTime = tick()
+local sessionStartTime = os.time()
 
 -- ── Colour Palette ───────────────────────────────────────────────
 local C = {
@@ -867,7 +867,7 @@ task.spawn(function()
             if ok3 then pingVal.Text = tostring(ping2) .. " ms" end
         end
 
-        local elapsed = tick() - sessionStartTime
+        local elapsed = os.time() - sessionStartTime
         local h = math.floor(elapsed / 3600)
         local m = math.floor((elapsed % 3600) / 60)
         local s = math.floor(elapsed % 60)
@@ -1191,6 +1191,21 @@ local updateAPPre = createToggleSwitch(apPreRow, _G.AutoPrestigeToggle, function
     triggerUpdate(newState)
 end)
 
+local apPreDisplay = make("TextButton", apPreRow, {
+    Size = UDim2.new(0, 90, 0, 26),
+    Position = UDim2.new(0, 250, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.AutoPrestigeNumber,
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.Code,
+    TextSize = 11,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    Active = true,
+    ZIndex = 6,
+})
+corner(apPreDisplay, 5)
+stroke(apPreDisplay, 1, C.BORDER_GLOW, 0.4)
+
 local apPreInput = make("TextBox", apPreRow, {
     Size = UDim2.new(0, 90, 0, 26),
     Position = UDim2.new(0, 250, 0.5, -13),
@@ -1200,21 +1215,34 @@ local apPreInput = make("TextBox", apPreRow, {
     Font = Enum.Font.Code,
     TextSize = 11,
     TextYAlignment = Enum.TextYAlignment.Center,
+    Visible = false,
     ClearTextOnFocus = false,
+    ZIndex = 7,
 })
 corner(apPreInput, 5)
 stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
 
+apPreDisplay.Activated:Connect(function()
+    apPreInput.Text = _G.AutoPrestigeNumber
+    apPreInput.Visible = true
+    apPreInput:CaptureFocus()
+end)
+
+local apPreTyped = _G.AutoPrestigeNumber
+
+apPreInput:GetPropertyChangedSignal("Text"):Connect(function()
+    if apPreInput:IsFocused() then apPreTyped = apPreInput.Text end
+end)
+
 apPreInput.FocusLost:Connect(function()
-    local raw = apPreInput.Text:match("^%s*(.-)%s*$")
-    local num = raw and tonumber(raw)
+    apPreInput.Visible = false
+    local num = tonumber(apPreTyped)
     if num and num >= 1 then
         local r = math.floor(num / 2 + 0.5) * 2
         if r < 2 then r = 2 end
-        _G.AutoPrestigeNumber = tostring(r)
-        task.spawn(function()
-            apPreInput.Text = tostring(r)
-        end)
+        local rs = tostring(r)
+        _G.AutoPrestigeNumber = rs
+        apPreDisplay.Text = rs
     end
 end)
 
