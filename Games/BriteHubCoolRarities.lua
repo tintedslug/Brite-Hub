@@ -2750,7 +2750,7 @@ task.spawn(function()
                         local upper = btn:FindFirstChild("Up2")
                         local ppText = upper and upper:FindFirstChild("TextLabel")
                         local pp = ppText and tonumber(ppText.Text:match("%+([%d%.]+)")) or 0
-                        local target = tonumber(_G.AutoPrestigeNumber) or 1000
+                        local target = tonumber(_G.AutoPrestigeNumber) or 2
                         if pp ~= nil and pp < target then
                             fireTouch(btn)
                         end
