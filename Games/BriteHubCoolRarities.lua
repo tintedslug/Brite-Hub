@@ -64,6 +64,15 @@ _G.SmartButtonToggle     = false
 _G.ButtonFarmKeybind     = "-"
 _G.ButtonFarmSelectionIdx = 1
 
+-- Auto Progress
+_G.AutoProgressToggle      = false
+_G.AutoSuperMultiplyToggle = false
+_G.AutoSuperMultiplyNumber = "1m"
+_G.AutoPrestigeToggle      = false
+_G.AutoPrestigeNumber      = "1000"
+_G.AutoAscendToggle        = false
+_G.AutoProgressKeybind     = "U"
+
 -- GUI & Teleport Keybinds
 _G.GuiToggleKeybind  = "RightShift"
 _G.TpRollKeybind     = "R"
@@ -985,14 +994,277 @@ make("UIPadding", FarmTab, {
     PaddingRight  = UDim.new(0, 10),
 })
 
-local FarmCardRow = make("Frame", FarmTab, {
-    Name = "FarmCardRow",
-    Size = UDim2.new(1, 0, 0, 400),
+-- ── Auto Progress Card ────────────────────────────────────────
+local AutoProgCard = make("Frame", FarmTab, {
+    Name = "AutoProgCard",
+    Size = UDim2.new(1, 0, 0, 260),
     BackgroundTransparency = 1,
     LayoutOrder = 1,
 })
 
-local CloverCard = makeCard(FarmCardRow, "CloverCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
+make("TextLabel", AutoProgCard, {
+    Name = "AutoProgHeader",
+    Size = UDim2.new(1, -20, 0, 32),
+    Position = UDim2.new(0, 14, 0, 8),
+    BackgroundTransparency = 1,
+    Text = "Auto Progress",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ZIndex = 5,
+})
+
+local AutoProgScroll = make("ScrollingFrame", AutoProgCard, {
+    Size = UDim2.new(1, -16, 1, -48),
+    Position = UDim2.new(0, 8, 0, 40),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    ScrollBarThickness = 4,
+    ScrollBarImageColor3 = C.ACCENT_PURPLE,
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+})
+
+make("UIListLayout", AutoProgScroll, {
+    FillDirection = Enum.FillDirection.Vertical,
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 8),
+})
+
+make("UIPadding", AutoProgScroll, {
+    PaddingTop = UDim.new(0, 4),
+    PaddingBottom = UDim.new(0, 12),
+    PaddingLeft = UDim.new(0, 4),
+    PaddingRight = UDim.new(0, 10),
+})
+
+-- Master toggle row
+local apMasterRow = make("Frame", AutoProgScroll, {
+    Name = "APMasterRow",
+    Size = UDim2.new(1, 0, 0, 44),
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel = 0,
+    LayoutOrder = 1,
+})
+corner(apMasterRow, 8)
+stroke(apMasterRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", apMasterRow, {
+    Size = UDim2.new(0, 230, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Auto Progress",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+local updateAPSwitch = createToggleSwitch(apMasterRow, _G.AutoProgressToggle, function(newState, triggerUpdate)
+    _G.AutoProgressToggle = newState
+    triggerUpdate(newState)
+end)
+
+-- Auto Super Multiply row
+local apSMRow = make("Frame", AutoProgScroll, {
+    Name = "APSMRow",
+    Size = UDim2.new(1, 0, 0, 44),
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel = 0,
+    LayoutOrder = 2,
+})
+corner(apSMRow, 8)
+stroke(apSMRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", apSMRow, {
+    Size = UDim2.new(0, 150, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Super Multiply",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamMedium,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+local updateAPSM = createToggleSwitch(apSMRow, _G.AutoSuperMultiplyToggle, function(newState, triggerUpdate)
+    _G.AutoSuperMultiplyToggle = newState
+    triggerUpdate(newState)
+end)
+
+local apSMInput = make("TextBox", apSMRow, {
+    Size = UDim2.new(0, 90, 0, 26),
+    Position = UDim2.new(0, 250, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.AutoSuperMultiplyNumber,
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.Code,
+    TextSize = 11,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ClearTextOnFocus = false,
+})
+corner(apSMInput, 5)
+stroke(apSMInput, 1, C.BORDER_GLOW, 0.4)
+
+apSMInput.FocusLost:Connect(function()
+    local raw = apSMInput.Text:match("^%s*(.-)%s*$")
+    if raw and raw ~= "" then
+        local n = valOrDecodeAbbr(raw)
+        if n and n >= 1 then
+            _G.AutoSuperMultiplyNumber = raw
+            apSMInput.Text = raw
+        else
+            apSMInput.Text = _G.AutoSuperMultiplyNumber
+        end
+    else
+        apSMInput.Text = _G.AutoSuperMultiplyNumber
+    end
+end)
+
+-- Auto Prestige row
+local apPreRow = make("Frame", AutoProgScroll, {
+    Name = "APPreRow",
+    Size = UDim2.new(1, 0, 0, 44),
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel = 0,
+    LayoutOrder = 3,
+})
+corner(apPreRow, 8)
+stroke(apPreRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", apPreRow, {
+    Size = UDim2.new(0, 150, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Prestige",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamMedium,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+local updateAPPre = createToggleSwitch(apPreRow, _G.AutoPrestigeToggle, function(newState, triggerUpdate)
+    _G.AutoPrestigeToggle = newState
+    triggerUpdate(newState)
+end)
+
+local apPreInput = make("TextBox", apPreRow, {
+    Size = UDim2.new(0, 90, 0, 26),
+    Position = UDim2.new(0, 250, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.AutoPrestigeNumber,
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.Code,
+    TextSize = 11,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    ClearTextOnFocus = false,
+})
+corner(apPreInput, 5)
+stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
+
+apPreInput.FocusLost:Connect(function()
+    local raw = apPreInput.Text:match("^%s*(.-)%s*$")
+    if raw and raw ~= "" then
+        local n = valOrDecodeAbbr(raw)
+        if n and n >= 1 then
+            local rounded = n - (n % 2)
+            if rounded < 1 then rounded = 2 end
+            _G.AutoPrestigeNumber = tostring(rounded)
+            apPreInput.Text = tostring(rounded)
+        else
+            apPreInput.Text = _G.AutoPrestigeNumber
+        end
+    else
+        apPreInput.Text = _G.AutoPrestigeNumber
+    end
+end)
+
+-- Auto Ascend row (no textbox)
+local apAscRow = make("Frame", AutoProgScroll, {
+    Name = "APAscRow",
+    Size = UDim2.new(1, 0, 0, 44),
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel = 0,
+    LayoutOrder = 4,
+})
+corner(apAscRow, 8)
+stroke(apAscRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", apAscRow, {
+    Size = UDim2.new(0, 230, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Ascend (auto when req met)",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamMedium,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+local updateAPAsc = createToggleSwitch(apAscRow, _G.AutoAscendToggle, function(newState, triggerUpdate)
+    _G.AutoAscendToggle = newState
+    triggerUpdate(newState)
+end)
+
+-- Auto Progress keybind row
+local apKeyRow = make("Frame", AutoProgScroll, {
+    Name = "APKeyRow",
+    Size = UDim2.new(1, 0, 0, 44),
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel = 0,
+    LayoutOrder = 5,
+})
+corner(apKeyRow, 8)
+stroke(apKeyRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", apKeyRow, {
+    Size = UDim2.new(0, 160, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Auto Progress Hotkey:",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+local APKeyBtn = make("TextButton", apKeyRow, {
+    Size = UDim2.new(0, 100, 0, 26),
+    Position = UDim2.new(0, 170, 0.5, -13),
+    BackgroundColor3 = C.BG_CARD,
+    Text = _G.AutoProgressKeybind,
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextYAlignment = Enum.TextYAlignment.Center,
+    Active = true,
+})
+corner(APKeyBtn, 5)
+stroke(APKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
+
+APKeyBtn.Activated:Connect(function()
+    _G.captureTarget = APKeyBtn
+    _G.captureCallback = function(k) _G.AutoProgressKeybind = k end
+    APKeyBtn.Text = "..."
+    APKeyBtn.TextColor3 = C.TEXT_SUB
+end)
+
+local FarmCardRow = make("Frame", FarmTab, {
+    Name = "FarmCardRow",
+    Size = UDim2.new(1, 0, 0, 400),
+    BackgroundTransparency = 1,
+    LayoutOrder = 2,
+})
+
+local CloverCard = makeCard(FarmCardRow, "CloverCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0.5, 6, 0, 0), C.BG_CARD, 12)
 stroke(CloverCard, 1, C.BORDER_GLOW, 0.5)
 
 local CloverHeaderLabel = make("TextLabel", CloverCard, {
@@ -1034,7 +1306,7 @@ make("UIPadding", CloverScroll, {
     PaddingRight  = UDim.new(0, 10)
 })
 
-local AutoFarmCard = makeCard(FarmCardRow, "AutoFarmCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0.5, 6, 0, 0), C.BG_CARD, 12)
+local AutoFarmCard = makeCard(FarmCardRow, "AutoFarmCard", UDim2.new(0.5, -6, 1, 0), UDim2.new(0, 0, 0, 0), C.BG_CARD, 12)
 stroke(AutoFarmCard, 1, C.BORDER_GLOW, 0.5)
 
 local AutoFarmHeaderLabel = make("TextLabel", AutoFarmCard, {
@@ -1459,7 +1731,7 @@ local FarmRow2 = make("Frame", FarmTab, {
     Name = "FarmRow2",
     Size = UDim2.new(1, 0, 0, 400),
     BackgroundTransparency = 1,
-    LayoutOrder = 2,
+    LayoutOrder = 3,
 })
 
 -- ── Rune Farm Card (left) ─────────────────────────────────────
@@ -1874,6 +2146,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
         _G.ButtonFarmToggle = not _G.ButtonFarmToggle
         if bfUpdateSwitch then bfUpdateSwitch(_G.ButtonFarmToggle) end
         return
+    elseif keyName == _G.AutoProgressKeybind then
+        _G.AutoProgressToggle = not _G.AutoProgressToggle
+        if updateAPSwitch then updateAPSwitch(_G.AutoProgressToggle) end
+        return
     elseif keyName == _G.GuiToggleKeybind then
         guiVisible = not guiVisible
         MainFrame.Visible = guiVisible
@@ -2224,6 +2500,50 @@ for id, def in pairs(NavButtons) do
 end
 
 -- ─────────────────────────────────────────────────────────────────
+-- 11b. ABBREVIATION DECODER (reverse of Bnum.short())
+-- ─────────────────────────────────────────────────────────────────
+local shortU8   = {"", "U", "D", "T", "Qd", "Qn", "Sx", "Sp", "Oc", "No"}
+local shortU9   = {"", "De", "Vg", "Tg", "qg", "Qg", "sg", "Sg", "Og", "Ng"}
+local shortU10  = {"", "Ce", "Du", "Tr", "Qa", "Qi", "Se", "Si", "Ot", "Ni"}
+
+local suffixToExp = {}
+do
+    local function genSuffix(v6)
+        if v6 == 0 then return "K" end
+        if v6 == 1 then return "M" end
+        if v6 == 2 then return "B" end
+        local ones  = (v6 % 10) + 1
+        local tens  = (math.floor(v6 / 10) % 10) + 1
+        local hunds = (math.floor(v6 / 100) % 10) + 1
+        return shortU10[hunds] .. shortU9[tens] .. shortU8[ones]
+    end
+    for v6 = 0, 999 do
+        local s = genSuffix(v6)
+        suffixToExp[s] = v6 * 3 + 3
+    end
+end
+
+local function decodeAbbr(str)
+    if not str or str == "" then return nil end
+    str = string.upper(str)
+    local numPart, suffix = str:match("^(%d+%.?%d*)([%a]*)$")
+    if not numPart then return nil end
+    local num = tonumber(numPart)
+    if not num then return nil end
+    if suffix == nil or suffix == "" then return num end
+    local exp = suffixToExp[suffix]
+    if not exp then return nil end
+    return num * (10 ^ exp)
+end
+
+local function valOrDecodeAbbr(str)
+    if not str or str == "" then return nil end
+    local n = tonumber(str)
+    if n then return n end
+    return decodeAbbr(str)
+end
+
+-- ─────────────────────────────────────────────────────────────────
 -- 12. RUNTIME REBIRTH / CLOVER WORKSPACE HOOK INTERACTION THREADS
 -- ─────────────────────────────────────────────────────────────────
 local function fireTouch(part)
@@ -2399,6 +2719,67 @@ task.spawn(function()
                 end
                 if target and target.btn then
                     fireTouch(target.btn)
+                end
+            end)
+        end
+        task.wait(_G.FarmWaitTime)
+    end
+end)
+
+-- Auto Progress Loop Thread
+task.spawn(function()
+    while true do
+        if _G.AutoProgressToggle then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+
+                -- 1. Super Multiply
+                if _G.AutoSuperMultiplyToggle then
+                    local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Super Multi Get")
+                    if btn then
+                        local scriptObj = btn:FindFirstChild("Script")
+                        local gives = scriptObj and scriptObj:FindFirstChild("UpgradesMultiMulti")
+                        local currentVal = gives and tonumber(gives.Value) or 0
+                        local target = valOrDecodeAbbr(_G.AutoSuperMultiplyNumber) or 1
+                        if currentVal < target then
+                            fireTouch(btn)
+                        end
+                    end
+                end
+
+                -- 2. Prestige
+                if _G.AutoPrestigeToggle then
+                    local btn = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Prestige Get")
+                    if btn then
+                        local upper = btn:FindFirstChild("Up2")
+                        local ppText = upper and upper:FindFirstChild("TextLabel")
+                        local pp = ppText and tonumber(ppText.Text:match("%+([%d%.]+)")) or 0
+                        local target = tonumber(_G.AutoPrestigeNumber) or 1000
+                        if pp ~= nil and pp < target then
+                            fireTouch(btn)
+                        end
+                    end
+                end
+
+                -- 3. Ascend
+                if _G.AutoAscendToggle then
+                    local ascend = workspace:FindFirstChild("asecnd")
+                    local roll = ascend and ascend:FindFirstChild("RollRarity")
+                    if roll then
+                        local upper = roll:FindFirstChild("Up3")
+                        local reqText = upper and upper:FindFirstChild("TextLabel")
+                        local reqNum = reqText and tonumber(reqText.Text:match("%((%d+)%)"))
+                        if reqNum then
+                            local pd = LocalPlayer and LocalPlayer:FindFirstChild("PlayerData")
+                            local rs = pd and pd:FindFirstChild("Rarity")
+                            local rarityId = rs and tonumber(rs.Value:match("^(%d+);"))
+                            if rarityId and rarityId >= reqNum then
+                                fireTouch(roll)
+                            end
+                        end
+                    end
                 end
             end)
         end
