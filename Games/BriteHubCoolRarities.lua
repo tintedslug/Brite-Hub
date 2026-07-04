@@ -310,7 +310,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.1.1 Custom",
+    Text             = "v4.1.2 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -932,7 +932,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.1.1",
+    " Running BriteHub Build v4.1.2",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1571,17 +1571,7 @@ UserInputService.InputBegan:Connect(function(input, processed)
 
     local keyName = input.KeyCode.Name
 
-    -- Capture mode — single generic pointer works regardless of closure scoping
-    if _G.captureTarget then
-        if _G.captureCallback then _G.captureCallback(keyName) end
-        _G.captureTarget.Text = keyName
-        _G.captureTarget.TextColor3 = C.ACCENT_PURPLE
-        _G.captureTarget = nil
-        _G.captureCallback = nil
-        return
-    end
-
-    -- Farm / GUI toggle hotkeys must fire even when processed=true so they always respond
+    -- Farm / GUI toggle hotkeys — FIRST, before capture mode, so they never lag
     if keyName == _G.FarmKeybind then
         _G.CloverFarming = not _G.CloverFarming
         updateCloverSwitch(_G.CloverFarming)
@@ -1598,6 +1588,16 @@ UserInputService.InputBegan:Connect(function(input, processed)
         guiVisible = not guiVisible
         MainFrame.Visible = guiVisible
         GlowFrame.Visible = guiVisible
+        return
+    end
+
+    -- Capture mode — single generic pointer works regardless of closure scoping
+    if _G.captureTarget then
+        if _G.captureCallback then _G.captureCallback(keyName) end
+        _G.captureTarget.Text = keyName
+        _G.captureTarget.TextColor3 = C.ACCENT_PURPLE
+        _G.captureTarget = nil
+        _G.captureCallback = nil
         return
     end
 
