@@ -1114,8 +1114,21 @@ stroke(apSMInput, 1, C.BORDER_GLOW, 0.4)
 apSMInput.FocusLost:Connect(function()
     local raw = apSMInput.Text:match("^%s*(.-)%s*$")
     if raw and raw ~= "" then
-        local n = valOrDecodeAbbr(raw)
-        if n and n >= 1 then
+        local okNum
+        if raw:match("^%d+$") then
+            okNum = tonumber(raw)
+        else
+            local upper = string.upper(raw)
+            local numPart, suffix = upper:match("^(%d+)([%a]+)$")
+            if numPart and suffix then
+                local num = tonumber(numPart)
+                local exp = suffixToExp[suffix]
+                if num and exp and num >= 1 then
+                    okNum = num * (10 ^ exp)
+                end
+            end
+        end
+        if okNum then
             _G.AutoSuperMultiplyNumber = raw
             apSMInput.Text = raw
         else
@@ -1171,10 +1184,23 @@ stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
 apPreInput.FocusLost:Connect(function()
     local raw = apPreInput.Text:match("^%s*(.-)%s*$")
     if raw and raw ~= "" then
-        local n = valOrDecodeAbbr(raw)
-        if n and n >= 1 then
-            local rounded = n - (n % 2)
-            if rounded < 1 then rounded = 2 end
+        local okVal
+        if raw:match("^%d+$") then
+            okVal = tonumber(raw)
+        else
+            local upper = string.upper(raw)
+            local numPart, suffix = upper:match("^(%d+)([%a]+)$")
+            if numPart and suffix then
+                local num = tonumber(numPart)
+                local exp = suffixToExp[suffix]
+                if num and exp and num >= 1 then
+                    okVal = num * (10 ^ exp)
+                end
+            end
+        end
+        if okVal and okVal >= 1 then
+            local rounded = math.floor(okVal / 2 + 0.5) * 2
+            if rounded < 2 then rounded = 2 end
             _G.AutoPrestigeNumber = tostring(rounded)
             apPreInput.Text = tostring(rounded)
         else
