@@ -1797,6 +1797,25 @@ local function fireTouch(part)
     end
 end
 
+local function findRightColumnBtn(name)
+    local kids = workspace.Buttons:GetChildren()
+    local candidates = {}
+    for _, v in ipairs(kids) do
+        if v.Name == name then
+            local pos = v:IsA("BasePart") and v.Position
+            if pos and pos.X > 100 then
+                table.insert(candidates, v)
+            end
+        end
+    end
+    if #candidates == 1 then
+        return candidates[1]
+    elseif #candidates > 1 then
+        table.sort(candidates, function(a, b) return a.Position.Z < b.Position.Z end)
+        return candidates[1]
+    end
+end
+
 -- Clover Farm Loop Thread
 task.spawn(function()
     while true do
@@ -1869,7 +1888,7 @@ task.spawn(function()
                                 if choice == "1" then
                                     upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade11")
                                 elseif choice == "2" then
-                                    upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 5")
+                                    upg = findRightColumnBtn("Rebirth Upgrade 5")
                                 elseif choice == "3" then
                                     upg = workspace.Buttons:FindFirstChild("Rebirth Upgrade 6")
                                 elseif choice == "4" then
