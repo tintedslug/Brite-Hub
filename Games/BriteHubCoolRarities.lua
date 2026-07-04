@@ -51,6 +51,7 @@ _G.FarmKeybind       = "Comma"
 _G.AutoFarmKeybind   = "J"
 
 -- Rune Farm
+_G.RuneFarmMaster      = false
 _G.RuneCloverToggle    = false
 _G.RunePlantToggle     = false
 _G.RuneBaseluckToggle  = false
@@ -309,7 +310,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.0.0 Custom",
+    Text             = "v4.1.1 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -931,7 +932,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.0.0",
+    " Running BriteHub Build v4.1.1",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1481,6 +1482,25 @@ make("UIPadding", RuneScroll, {
     PaddingRight = UDim.new(0, 10),
 })
 
+-- Master toggle
+local MasterRow = makeCard(RuneScroll, "MasterRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
+MasterRow.LayoutOrder = 1
+make("TextLabel", MasterRow, {
+    Size = UDim2.new(0, 200, 1, 0),
+    Position = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text = "Rune Farm",
+    TextColor3 = C.TEXT_PRIMARY,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+local updateRuneMaster = createToggleSwitch(MasterRow, _G.RuneFarmMaster, function(newState, triggerUpdate)
+    _G.RuneFarmMaster = newState
+    triggerUpdate(newState)
+end)
+
 local runeUpdates = {}
 local function runeRow(name, layoutOrder)
     local row = makeCard(RuneScroll, name.."Row", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
@@ -1503,13 +1523,13 @@ local function runeRow(name, layoutOrder)
     runeUpdates[name] = update
 end
 
-runeRow("Clover", 1)
-runeRow("Plant", 2)
-runeRow("Baseluck", 3)
-runeRow("Prestige", 4)
+runeRow("Clover", 2)
+runeRow("Plant", 3)
+runeRow("Baseluck", 4)
+runeRow("Prestige", 5)
 
 local RuneKeyRow = makeCard(RuneScroll, "RuneKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-RuneKeyRow.LayoutOrder = 5
+RuneKeyRow.LayoutOrder = 6
 make("TextLabel", RuneKeyRow, {
     Size = UDim2.new(0, 140, 1, 0),
     Position = UDim2.new(0, 12, 0, 0),
@@ -1571,8 +1591,8 @@ UserInputService.InputBegan:Connect(function(input, processed)
         updateAutoFarmSwitch(_G.ButtonAutofarm)
         return
     elseif keyName == _G.RuneFarmKeybind then
-        _G.RuneCloverToggle = not _G.RuneCloverToggle
-        if runeUpdates.Clover then runeUpdates.Clover(_G.RuneCloverToggle) end
+        _G.RuneFarmMaster = not _G.RuneFarmMaster
+        if updateRuneMaster then updateRuneMaster(_G.RuneFarmMaster) end
         return
     elseif keyName == _G.GuiToggleKeybind then
         guiVisible = not guiVisible
@@ -2053,7 +2073,7 @@ task.spawn(function()
         Prestige = "runezz",
     }
     while true do
-        if _G.RuneCloverToggle or _G.RunePlantToggle or _G.RuneBaseluckToggle or _G.RunePrestigeToggle then
+        if _G.RuneFarmMaster and (_G.RuneCloverToggle or _G.RunePlantToggle or _G.RuneBaseluckToggle or _G.RunePrestigeToggle) then
             pcall(function()
                 for name, folderName in pairs(runePaths) do
                     if _G["Rune"..name.."Toggle"] then
