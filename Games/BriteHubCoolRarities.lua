@@ -1205,23 +1205,27 @@ local apPreInput = make("TextBox", apPreRow, {
 corner(apPreInput, 5)
 stroke(apPreInput, 1, C.BORDER_GLOW, 0.4)
 
-apPreInput.FocusLost:Connect(function()
-    local raw = apPreInput.Text:match("^%s*(.-)%s*$")
-    if raw and raw ~= "" then
-        local num = tonumber(raw)
-        if num and num >= 1 then
-            local r = math.floor(num / 2 + 0.5) * 2
-            if r < 2 then r = 2 end
-            _G.AutoPrestigeNumber = tostring(r)
-            apPreInput.Text = ""
-            apPreInput.Text = tostring(r)
-        else
-            apPreInput.Text = _G.AutoPrestigeNumber
-        end
-    else
-        apPreInput.Text = _G.AutoPrestigeNumber
-    end
+local apPreTyped = _G.AutoPrestigeNumber
+
+apPreInput:GetPropertyChangedSignal("Text"):Connect(function()
+    if apPreInput:IsFocused() then apPreTyped = apPreInput.Text end
 end)
+
+local function apPreRound()
+    local num = tonumber(apPreTyped)
+    if num and num >= 1 then
+        local r = math.floor(num / 2 + 0.5) * 2
+        if r < 2 then r = 2 end
+        local rs = tostring(r)
+        _G.AutoPrestigeNumber = rs
+        apPreInput.Text = ""
+        apPreInput.Text = rs
+        apPreInput.TextColor3 = C.ACCENT_PINK
+        task.delay(0.8, function() apPreInput.TextColor3 = C.TEXT_PRIMARY end)
+    end
+end
+
+apPreInput.FocusLost:Connect(apPreRound)
 
 -- Auto Ascend row (no textbox)
 local apAscRow = make("Frame", AutoProgScroll, {
