@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.3.5                       ║
+    ║                     BRITE HUB  v4.3.6                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.3.5 Custom",
+    Text             = "v4.3.6 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -971,7 +971,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.3.5",
+    " Running BriteHub Build v4.3.6",
 }
 
 for _, entry in ipairs(cleanEntries) do
