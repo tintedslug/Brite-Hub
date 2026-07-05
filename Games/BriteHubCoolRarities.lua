@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║                     BRITE HUB  v4.6.8                       ║
+    ║                     BRITE HUB  v4.6.9                       ║
     ║          Dark-Themed Dashboard UI — Luau / Roblox           ║
     ║    Run from the Studio Command Bar or a LocalScript          ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -325,7 +325,7 @@ local SubLabel = make("TextLabel", TitleStack, {
     Name             = "SubLabel",
     Size             = UDim2.new(1, 0, 0, 14),
     BackgroundTransparency = 1,
-    Text             = "v4.6.8 Custom",
+    Text             = "v4.6.9 Custom",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 11,
@@ -995,7 +995,7 @@ local cleanEntries = {
     " System environment linked",
     " Modules integrity: OK",
     " Hook Verification Level = " .. tostring(uncRate) .. "%",
-    " Running BriteHub Build v4.6.8",
+    " Running BriteHub Build v4.6.9",
 }
 
 for _, entry in ipairs(cleanEntries) do
@@ -1270,50 +1270,6 @@ local updateAPAsc = createToggleSwitch(apAscRow, _G.AutoAscendToggle, function(n
     triggerUpdate(newState)
 end)
 
--- Auto Progress keybind row
-local apKeyRow = make("Frame", AutoProgScroll, {
-    Name = "APKeyRow",
-    Size = UDim2.new(1, 0, 0, 44),
-    BackgroundColor3 = C.BG_CARD2,
-    BorderSizePixel = 0,
-    LayoutOrder = 5,
-})
-corner(apKeyRow, 8)
-stroke(apKeyRow, 1, C.BORDER_GLOW, 0.55)
-
-make("TextLabel", apKeyRow, {
-    Size = UDim2.new(0, 160, 1, 0),
-    Position = UDim2.new(0, 12, 0, 0),
-    BackgroundTransparency = 1,
-    Text = "Auto Progress Hotkey:",
-    TextColor3 = C.TEXT_PRIMARY,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-
-local APKeyBtn = make("TextButton", apKeyRow, {
-    Size = UDim2.new(0, 100, 0, 26),
-    Position = UDim2.new(0, 170, 0.5, -13),
-    BackgroundColor3 = C.BG_CARD,
-    Text = _G.AutoProgressKeybind,
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextYAlignment = Enum.TextYAlignment.Center,
-    Active = true,
-})
-corner(APKeyBtn, 5)
-stroke(APKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
-
-APKeyBtn.Activated:Connect(function()
-    _G.captureTarget = APKeyBtn
-    _G.captureCallback = function(k) _G.AutoProgressKeybind = k end
-    APKeyBtn.Text = "..."
-    APKeyBtn.TextColor3 = C.TEXT_SUB
-end)
-
 local FarmCardRow = make("Frame", FarmTab, {
     Name = "FarmCardRow",
     Size = UDim2.new(1, 0, 0, 400),
@@ -1426,46 +1382,9 @@ local updateCloverSwitch = createToggleSwitch(CloverRow, _G.CloverFarming, funct
     triggerUpdate(_G.CloverFarming)
 end)
 
--- Clover Capture Hotkey Box
-local KeyRow1 = makeCard(CloverScroll, "KeyRow1", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-KeyRow1.LayoutOrder = 2
-
-make("TextLabel", KeyRow1, {
-    Size             = UDim2.new(0, 140, 1, 0),
-    Position         = UDim2.new(0, 12, 0, 0),
-    BackgroundTransparency = 1,
-    Text             = "Clover Farm Hotkey:",
-    TextColor3       = C.TEXT_PRIMARY,
-    Font             = Enum.Font.GothamMedium,
-    TextSize         = 12,
-    TextXAlignment   = Enum.TextXAlignment.Left,
-    TextYAlignment   = Enum.TextYAlignment.Center,
-})
-
-local KeyBtn1 = make("TextButton", KeyRow1, {
-    Size             = UDim2.new(0, 120, 0, 26),
-    Position         = UDim2.new(0, 160, 0.5, -13),
-    BackgroundColor3 = C.BG_CARD,
-    Text             = _G.FarmKeybind,
-    TextColor3       = C.ACCENT_PURPLE,
-    Font             = Enum.Font.GothamBold,
-    TextSize         = 12,
-    TextYAlignment   = Enum.TextYAlignment.Center,
-    Active           = true,
-})
-corner(KeyBtn1, 5)
-stroke(KeyBtn1, 1.2, C.BORDER_GLOW, 0.4)
-
-KeyBtn1.Activated:Connect(function()
-    _G.captureTarget = KeyBtn1
-    _G.captureCallback = function(k) _G.FarmKeybind = k end
-    KeyBtn1.Text = "..."
-    KeyBtn1.TextColor3 = C.TEXT_SUB
-end)
-
 -- Clover World toggle row
 local WorldRow = makeCard(CloverScroll, "WorldRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-WorldRow.LayoutOrder = 3
+WorldRow.LayoutOrder = 2
 
 make("TextLabel", WorldRow, {
     Size             = UDim2.new(0, 200, 1, 0),
@@ -1744,43 +1663,6 @@ TimeInput.FocusLost:Connect(function()
     end
 end)
 
--- Touch Capture Hotkey Box
-local KeyRow2 = makeCard(AutoFarmScroll, "KeyRow2", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-KeyRow2.LayoutOrder = 7
-
-make("TextLabel", KeyRow2, {
-    Size             = UDim2.new(0, 140, 1, 0),
-    Position         = UDim2.new(0, 12, 0, 0),
-    BackgroundTransparency = 1,
-    Text             = "Touch Farm Hotkey:",
-    TextColor3       = C.TEXT_PRIMARY,
-    Font             = Enum.Font.GothamBold,
-    TextSize         = 12,
-    TextYAlignment   = Enum.TextYAlignment.Center,
-    Active           = true,
-})
-
-local KeyBtn2 = make("TextButton", KeyRow2, {
-    Size             = UDim2.new(0, 120, 0, 26),
-    Position         = UDim2.new(0, 160, 0.5, -13),
-    BackgroundColor3 = C.BG_CARD,
-    Text             = _G.AutoFarmKeybind,
-    TextColor3       = C.ACCENT_PURPLE,
-    Font             = Enum.Font.GothamBold,
-    TextSize         = 12,
-    TextYAlignment   = Enum.TextYAlignment.Center,
-    Active           = true,
-})
-corner(KeyBtn2, 5)
-stroke(KeyBtn2, 1.2, C.BORDER_GLOW, 0.4)
-
-KeyBtn2.Activated:Connect(function()
-    _G.captureTarget = KeyBtn2
-    _G.captureCallback = function(k) _G.AutoFarmKeybind = k end
-    KeyBtn2.Text = "..."
-    KeyBtn2.TextColor3 = C.TEXT_SUB
-end)
-
 -- ─────────────────────────────────────────────────────────────────
 --  Rune Farm + Button Farm Cards
 -- ─────────────────────────────────────────────────────────────────
@@ -1876,39 +1758,6 @@ runeRow("Clover", 2)
 runeRow("Plant", 3)
 runeRow("Baseluck", 4)
 runeRow("Prestige", 5)
-
-local RuneKeyRow = makeCard(RuneScroll, "RuneKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-RuneKeyRow.LayoutOrder = 6
-make("TextLabel", RuneKeyRow, {
-    Size = UDim2.new(0, 140, 1, 0),
-    Position = UDim2.new(0, 12, 0, 0),
-    BackgroundTransparency = 1,
-    Text = "Rune Farm Hotkey:",
-    TextColor3 = C.TEXT_PRIMARY,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-local RuneKeyBtn = make("TextButton", RuneKeyRow, {
-    Size = UDim2.new(0, 120, 0, 26),
-    Position = UDim2.new(0, 160, 0.5, -13),
-    BackgroundColor3 = C.BG_CARD,
-    Text = _G.RuneFarmKeybind,
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextYAlignment = Enum.TextYAlignment.Center,
-    Active = true,
-})
-corner(RuneKeyBtn, 5)
-stroke(RuneKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
-RuneKeyBtn.Activated:Connect(function()
-    _G.captureTarget = RuneKeyBtn
-    _G.captureCallback = function(k) _G.RuneFarmKeybind = k end
-    RuneKeyBtn.Text = "..."
-    RuneKeyBtn.TextColor3 = C.TEXT_SUB
-end)
 
 -- ── Button Farm Card (right) ──────────────────────────────────
 local ButtonFarmCard = makeCard(FarmRow2, "ButtonFarmCard", UDim2.new(0.5, -3, 1, 0), UDim2.new(0.5, 3, 0, 0), C.BG_CARD, 12)
@@ -2122,40 +1971,6 @@ bfDropdownHeader.Activated:Connect(function()
     end
 end)
 
--- Button Farm keybind row
-local BFKeyRow = makeCard(BFScroll, "BFKeyRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-BFKeyRow.LayoutOrder = 4
-make("TextLabel", BFKeyRow, {
-    Size = UDim2.new(0, 140, 1, 0),
-    Position = UDim2.new(0, 12, 0, 0),
-    BackgroundTransparency = 1,
-    Text = "Button Farm Hotkey:",
-    TextColor3 = C.TEXT_PRIMARY,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-local BFKeyBtn = make("TextButton", BFKeyRow, {
-    Size = UDim2.new(0, 120, 0, 26),
-    Position = UDim2.new(0, 160, 0.5, -13),
-    BackgroundColor3 = C.BG_CARD,
-    Text = _G.ButtonFarmKeybind,
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 12,
-    TextYAlignment = Enum.TextYAlignment.Center,
-    Active = true,
-})
-corner(BFKeyBtn, 5)
-stroke(BFKeyBtn, 1.2, C.BORDER_GLOW, 0.4)
-BFKeyBtn.Activated:Connect(function()
-    _G.captureTarget = BFKeyBtn
-    _G.captureCallback = function(k) _G.ButtonFarmKeybind = k end
-    BFKeyBtn.Text = "..."
-    BFKeyBtn.TextColor3 = C.TEXT_SUB
-end)
-
 -- Smart Button: find best match below player rarity
 local function getSmartButtonTarget()
     local pd = LocalPlayer and LocalPlayer:FindFirstChild("PlayerData")
@@ -2262,7 +2077,7 @@ end)
 
 
 -- ─────────────────────────────────────────────────────────────────
--- 9.  CONFIG TAB — GUI toggle keybind
+-- 9.  CONFIG TAB — all keybinds
 -- ─────────────────────────────────────────────────────────────────
 local ConfigTab = make("Frame", ContentArea, {
     Name             = "ConfigTab",
@@ -2302,7 +2117,7 @@ make("TextLabel", ConfigScroll, {
     Size             = UDim2.new(1, -8, 0, 40),
     LayoutOrder      = 0,
     BackgroundTransparency = 1,
-    Text             = "Configure your GUI toggle keybind. Press Right Shift to open/close the hub by default.",
+    Text             = "Configure all keybinds below. Click a keybind badge then press the desired key.",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 12,
@@ -2311,50 +2126,106 @@ make("TextLabel", ConfigScroll, {
     TextWrapped      = true,
 })
 
--- GUI Toggle keybind row
-local guiRow = make("Frame", ConfigScroll, {
-    Name             = "ConfigGuiRow",
-    Size             = UDim2.new(1, 0, 0, 42),
-    LayoutOrder      = 1,
-    BackgroundColor3 = C.BG_CARD2,
-    BorderSizePixel  = 0,
-})
-corner(guiRow, 8)
-stroke(guiRow, 1, C.BORDER_GLOW, 0.55)
+-- Keybind row helper
+local function makeKeybindRow(parent, layoutOrder, label, defaultKey, setter)
+    local row = make("Frame", parent, {
+        Size             = UDim2.new(1, 0, 0, 42),
+        LayoutOrder      = layoutOrder,
+        BackgroundColor3 = C.BG_CARD2,
+        BorderSizePixel  = 0,
+    })
+    corner(row, 8)
+    stroke(row, 1, C.BORDER_GLOW, 0.55)
 
-make("TextLabel", guiRow, {
-    Size             = UDim2.new(0.6, -20, 1, 0),
-    Position         = UDim2.new(0, 12, 0, 0),
+    make("TextLabel", row, {
+        Size             = UDim2.new(0.6, -20, 1, 0),
+        Position         = UDim2.new(0, 12, 0, 0),
+        BackgroundTransparency = 1,
+        Text             = label,
+        TextColor3       = C.TEXT_PRIMARY,
+        Font             = Enum.Font.GothamMedium,
+        TextSize         = 13,
+        TextXAlignment   = Enum.TextXAlignment.Left,
+        TextYAlignment   = Enum.TextYAlignment.Center,
+    })
+
+    local keyBtn = make("TextButton", row, {
+        Size             = UDim2.new(0, 70, 0, 28),
+        Position         = UDim2.new(1, -82, 0.5, -14),
+        BackgroundColor3 = C.BG_CARD,
+        Text             = defaultKey,
+        TextColor3       = C.ACCENT_PURPLE,
+        Font             = Enum.Font.GothamBold,
+        TextSize         = 13,
+        TextYAlignment   = Enum.TextYAlignment.Center,
+        Active           = true,
+        ZIndex           = 5,
+    })
+    corner(keyBtn, 6)
+    stroke(keyBtn, 1, C.BORDER_GLOW, 0.35)
+
+    keyBtn.Activated:Connect(function()
+        _G.captureTarget = keyBtn
+        _G.captureCallback = setter
+        keyBtn.Text = "..."
+        keyBtn.TextColor3 = C.TEXT_SUB
+    end)
+end
+
+-- Farm Controls
+make("TextLabel", ConfigScroll, {
+    Name = "FarmHotkeyHeader",
+    Size = UDim2.new(1, -12, 0, 24),
+    LayoutOrder = 1,
     BackgroundTransparency = 1,
-    Text             = "GUI Close / Open Key",
-    TextColor3       = C.TEXT_PRIMARY,
-    Font             = Enum.Font.GothamMedium,
-    TextSize         = 13,
-    TextXAlignment   = Enum.TextXAlignment.Left,
-    TextYAlignment   = Enum.TextYAlignment.Center,
+    Text = "Farm Hotkeys",
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
 })
 
-local guiKeyBtn = make("TextButton", guiRow, {
-    Size             = UDim2.new(0, 70, 0, 28),
-    Position         = UDim2.new(1, -82, 0.5, -14),
-    BackgroundColor3 = C.BG_CARD,
-    Text             = _G.GuiToggleKeybind,
-    TextColor3       = C.ACCENT_PURPLE,
-    Font             = Enum.Font.GothamBold,
-    TextSize         = 13,
-    TextYAlignment   = Enum.TextYAlignment.Center,
-    Active           = true,
-    ZIndex           = 5,
-})
-corner(guiKeyBtn, 6)
-stroke(guiKeyBtn, 1, C.BORDER_GLOW, 0.35)
+makeKeybindRow(ConfigScroll, 2, "Clover Farm", _G.FarmKeybind, function(k) _G.FarmKeybind = k end)
+makeKeybindRow(ConfigScroll, 3, "Touch / Auto Farm", _G.AutoFarmKeybind, function(k) _G.AutoFarmKeybind = k end)
+makeKeybindRow(ConfigScroll, 4, "Rune Farm", _G.RuneFarmKeybind, function(k) _G.RuneFarmKeybind = k end)
+makeKeybindRow(ConfigScroll, 5, "Button Farm", _G.ButtonFarmKeybind, function(k) _G.ButtonFarmKeybind = k end)
+makeKeybindRow(ConfigScroll, 6, "Auto Progress", _G.AutoProgressKeybind, function(k) _G.AutoProgressKeybind = k end)
 
-guiKeyBtn.Activated:Connect(function()
-    _G.captureTarget = guiKeyBtn
-    _G.captureCallback = function(k) _G.GuiToggleKeybind = k end
-    guiKeyBtn.Text = "..."
-    guiKeyBtn.TextColor3 = C.TEXT_SUB
-end)
+-- Teleport Hotkeys
+make("TextLabel", ConfigScroll, {
+    Name = "TPHotkeyHeader",
+    Size = UDim2.new(1, -12, 0, 24),
+    LayoutOrder = 7,
+    BackgroundTransparency = 1,
+    Text = "Teleport Hotkeys",
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+makeKeybindRow(ConfigScroll, 8, "Roll Teleport", _G.TpRollKeybind, function(k) _G.TpRollKeybind = k end)
+makeKeybindRow(ConfigScroll, 9, "Rebirth Teleport", _G.TpRebirthKeybind, function(k) _G.TpRebirthKeybind = k end)
+makeKeybindRow(ConfigScroll, 10, "Clover World Teleport", _G.TpCloverKeybind, function(k) _G.TpCloverKeybind = k end)
+makeKeybindRow(ConfigScroll, 11, "Base Luck Teleport", _G.TpBaseLuckKeybind, function(k) _G.TpBaseLuckKeybind = k end)
+
+-- General
+make("TextLabel", ConfigScroll, {
+    Name = "GeneralHotkeyHeader",
+    Size = UDim2.new(1, -12, 0, 24),
+    LayoutOrder = 12,
+    BackgroundTransparency = 1,
+    Text = "General",
+    TextColor3 = C.ACCENT_PURPLE,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextYAlignment = Enum.TextYAlignment.Center,
+})
+
+makeKeybindRow(ConfigScroll, 13, "GUI Toggle", _G.GuiToggleKeybind, function(k) _G.GuiToggleKeybind = k end)
 
 -- ─────────────────────────────────────────────────────────────────
 -- 10. TP TAB — dropdown-style teleport list
@@ -2409,8 +2280,8 @@ local function tpToInstance(inst)
     end)
 end
 
--- Builds one dropdown-style row: click anywhere = teleport, click keybind badge = rebind
-local function makeTPRow(order, label, defaultKey, onTeleport)
+-- Builds one teleport row: click anywhere = teleport
+local function makeTPRow(order, label, onTeleport)
     local row = make("Frame", TPScroll, {
         Name             = "TPRow_" .. tostring(order),
         Size             = UDim2.new(1, 0, 0, 42),
@@ -2421,8 +2292,8 @@ local function makeTPRow(order, label, defaultKey, onTeleport)
     corner(row, 8)
     stroke(row, 1, C.BORDER_GLOW, 0.55)
 
-    local labelTxt = make("TextLabel", row, {
-        Size             = UDim2.new(1, -100, 1, 0),
+    make("TextLabel", row, {
+        Size             = UDim2.new(1, -20, 1, 0),
         Position         = UDim2.new(0, 12, 0, 0),
         BackgroundTransparency = 1,
         Text             = label,
@@ -2433,24 +2304,8 @@ local function makeTPRow(order, label, defaultKey, onTeleport)
         TextYAlignment   = Enum.TextYAlignment.Center,
     })
 
-    local keyBtn = make("TextButton", row, {
-        Size             = UDim2.new(0, 70, 0, 28),
-        Position         = UDim2.new(1, -82, 0.5, -14),
-        BackgroundColor3 = C.BG_CARD,
-        Text             = defaultKey,
-        TextColor3       = C.ACCENT_PURPLE,
-        Font             = Enum.Font.GothamBold,
-        TextSize         = 13,
-        TextYAlignment   = Enum.TextYAlignment.Center,
-        Active           = true,
-        ZIndex           = 5,
-    })
-    corner(keyBtn, 6)
-    stroke(keyBtn, 1, C.BORDER_GLOW, 0.35)
-
-    -- Click the row body = teleport
     local clickArea = make("TextButton", row, {
-        Size             = UDim2.new(1, -90, 1, 0),
+        Size             = UDim2.new(1, 0, 1, 0),
         Position         = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
         Text             = "",
@@ -2458,12 +2313,10 @@ local function makeTPRow(order, label, defaultKey, onTeleport)
         ZIndex           = 4,
     })
     clickArea.Activated:Connect(onTeleport)
-
-    return keyBtn
 end
 
 -- Row 1: Roll
-rollKeyBtn = makeTPRow(1, "Roll", _G.TpRollKeybind, function()
+makeTPRow(1, "Roll", function()
     pcall(function()
         local rr = workspace:FindFirstChild("Roll System") and workspace["Roll System"]:FindFirstChild("RollRarity")
         tpToInstance(rr)
@@ -2471,7 +2324,7 @@ rollKeyBtn = makeTPRow(1, "Roll", _G.TpRollKeybind, function()
 end)
 
 -- Row 2: Rebirth
-rebirthKeyBtn = makeTPRow(2, "Rebirth", _G.TpRebirthKeybind, function()
+makeTPRow(2, "Rebirth", function()
     pcall(function()
         local rb = workspace:FindFirstChild("Buttons") and workspace.Buttons:FindFirstChild("Rebirth Get")
         tpToInstance(rb)
@@ -2479,39 +2332,13 @@ rebirthKeyBtn = makeTPRow(2, "Rebirth", _G.TpRebirthKeybind, function()
 end)
 
 -- Row 3: Clover World
-cloverKeyBtn = makeTPRow(3, "Clover World", _G.TpCloverKeybind, function()
+makeTPRow(3, "Clover World", function()
     tpToPos(-1035, 26, 21379)
 end)
 
 -- Row 4: Base Luck
-baseluckKeyBtn = makeTPRow(4, "Base Luck", _G.TpBaseLuckKeybind, function()
+makeTPRow(4, "Base Luck", function()
     tpToPos(-678, 312, -195)
-end)
-
--- Keybind capture triggers
-rollKeyBtn.Activated:Connect(function()
-    _G.captureTarget = rollKeyBtn
-    _G.captureCallback = function(k) _G.TpRollKeybind = k end
-    rollKeyBtn.Text = "..."
-    rollKeyBtn.TextColor3 = C.TEXT_SUB
-end)
-rebirthKeyBtn.Activated:Connect(function()
-    _G.captureTarget = rebirthKeyBtn
-    _G.captureCallback = function(k) _G.TpRebirthKeybind = k end
-    rebirthKeyBtn.Text = "..."
-    rebirthKeyBtn.TextColor3 = C.TEXT_SUB
-end)
-cloverKeyBtn.Activated:Connect(function()
-    _G.captureTarget = cloverKeyBtn
-    _G.captureCallback = function(k) _G.TpCloverKeybind = k end
-    cloverKeyBtn.Text = "..."
-    cloverKeyBtn.TextColor3 = C.TEXT_SUB
-end)
-baseluckKeyBtn.Activated:Connect(function()
-    _G.captureTarget = baseluckKeyBtn
-    _G.captureCallback = function(k) _G.TpBaseLuckKeybind = k end
-    baseluckKeyBtn.Text = "..."
-    baseluckKeyBtn.TextColor3 = C.TEXT_SUB
 end)
 
 -- ─────────────────────────────────────────────────────────────────
