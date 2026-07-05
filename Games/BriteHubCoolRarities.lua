@@ -1405,7 +1405,7 @@ end)
 
 -- Clover Farm Speed textbox
 local SpeedRow = makeCard(CloverScroll, "SpeedRow", UDim2.new(1, 0, 0, 44), UDim2.new(0, 0, 0, 0), C.BG_CARD2, 6)
-SpeedRow.LayoutOrder = 4
+SpeedRow.LayoutOrder = 3
 
 make("TextLabel", SpeedRow, {
     Size             = UDim2.new(0, 140, 1, 0),
@@ -2077,7 +2077,7 @@ end)
 
 
 -- ─────────────────────────────────────────────────────────────────
--- 9.  CONFIG TAB — all keybinds
+-- 9.  CONFIG TAB — GUI toggle keybind
 -- ─────────────────────────────────────────────────────────────────
 local ConfigTab = make("Frame", ContentArea, {
     Name             = "ConfigTab",
@@ -2114,10 +2114,10 @@ make("UIPadding", ConfigScroll, {
 -- Subtitle
 make("TextLabel", ConfigScroll, {
     Name             = "ConfigSubtitle",
-    Size             = UDim2.new(1, -8, 0, 40),
+    Size             = UDim2.new(1, -8, 0, 36),
     LayoutOrder      = 0,
     BackgroundTransparency = 1,
-    Text             = "Configure all keybinds below. Click a keybind badge then press the desired key.",
+    Text             = "Configure keybinds for all features. Click a keybind to rebind it.",
     TextColor3       = C.TEXT_SUB,
     Font             = Enum.Font.Gotham,
     TextSize         = 12,
@@ -2126,11 +2126,59 @@ make("TextLabel", ConfigScroll, {
     TextWrapped      = true,
 })
 
--- Keybind row helper
-local function makeKeybindRow(parent, layoutOrder, label, defaultKey, setter)
-    local row = make("Frame", parent, {
+-- GUI Toggle keybind row
+local guiRow = make("Frame", ConfigScroll, {
+    Name             = "ConfigGuiRow",
+    Size             = UDim2.new(1, 0, 0, 42),
+    LayoutOrder      = 1,
+    BackgroundColor3 = C.BG_CARD2,
+    BorderSizePixel  = 0,
+})
+corner(guiRow, 8)
+stroke(guiRow, 1, C.BORDER_GLOW, 0.55)
+
+make("TextLabel", guiRow, {
+    Size             = UDim2.new(0.6, -20, 1, 0),
+    Position         = UDim2.new(0, 12, 0, 0),
+    BackgroundTransparency = 1,
+    Text             = "GUI Close / Open Key",
+    TextColor3       = C.TEXT_PRIMARY,
+    Font             = Enum.Font.GothamMedium,
+    TextSize         = 13,
+    TextXAlignment   = Enum.TextXAlignment.Left,
+    TextYAlignment   = Enum.TextYAlignment.Center,
+})
+
+local guiKeyBtn = make("TextButton", guiRow, {
+    Size             = UDim2.new(0, 70, 0, 28),
+    Position         = UDim2.new(1, -82, 0.5, -14),
+    BackgroundColor3 = C.BG_CARD,
+    Text             = _G.GuiToggleKeybind,
+    TextColor3       = C.ACCENT_PURPLE,
+    Font             = Enum.Font.GothamBold,
+    TextSize         = 13,
+    TextYAlignment   = Enum.TextYAlignment.Center,
+    Active           = true,
+    ZIndex           = 5,
+})
+corner(guiKeyBtn, 6)
+stroke(guiKeyBtn, 1, C.BORDER_GLOW, 0.35)
+
+guiKeyBtn.Activated:Connect(function()
+    _G.captureTarget = guiKeyBtn
+    _G.captureCallback = function(k) _G.GuiToggleKeybind = k end
+    guiKeyBtn.Text = "..."
+    guiKeyBtn.TextColor3 = C.TEXT_SUB
+end)
+
+-- Config keybind row helper
+local configKeybindOrder = 1
+local function addConfigKeybind(label, bindGlobal, onCapture)
+    configKeybindOrder = configKeybindOrder + 1
+    local row = make("Frame", ConfigScroll, {
+        Name             = "ConfigKey_" .. label:gsub("%s+", ""),
         Size             = UDim2.new(1, 0, 0, 42),
-        LayoutOrder      = layoutOrder,
+        LayoutOrder      = configKeybindOrder,
         BackgroundColor3 = C.BG_CARD2,
         BorderSizePixel  = 0,
     })
@@ -2149,11 +2197,11 @@ local function makeKeybindRow(parent, layoutOrder, label, defaultKey, setter)
         TextYAlignment   = Enum.TextYAlignment.Center,
     })
 
-    local keyBtn = make("TextButton", row, {
+    local btn = make("TextButton", row, {
         Size             = UDim2.new(0, 70, 0, 28),
         Position         = UDim2.new(1, -82, 0.5, -14),
         BackgroundColor3 = C.BG_CARD,
-        Text             = defaultKey,
+        Text             = bindGlobal,
         TextColor3       = C.ACCENT_PURPLE,
         Font             = Enum.Font.GothamBold,
         TextSize         = 13,
@@ -2161,71 +2209,26 @@ local function makeKeybindRow(parent, layoutOrder, label, defaultKey, setter)
         Active           = true,
         ZIndex           = 5,
     })
-    corner(keyBtn, 6)
-    stroke(keyBtn, 1, C.BORDER_GLOW, 0.35)
+    corner(btn, 6)
+    stroke(btn, 1, C.BORDER_GLOW, 0.35)
 
-    keyBtn.Activated:Connect(function()
-        _G.captureTarget = keyBtn
-        _G.captureCallback = setter
-        keyBtn.Text = "..."
-        keyBtn.TextColor3 = C.TEXT_SUB
+    btn.Activated:Connect(function()
+        _G.captureTarget = btn
+        _G.captureCallback = onCapture
+        btn.Text = "..."
+        btn.TextColor3 = C.TEXT_SUB
     end)
 end
 
--- Farm Controls
-make("TextLabel", ConfigScroll, {
-    Name = "FarmHotkeyHeader",
-    Size = UDim2.new(1, -12, 0, 24),
-    LayoutOrder = 1,
-    BackgroundTransparency = 1,
-    Text = "Farm Hotkeys",
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 13,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-
-makeKeybindRow(ConfigScroll, 2, "Clover Farm", _G.FarmKeybind, function(k) _G.FarmKeybind = k end)
-makeKeybindRow(ConfigScroll, 3, "Touch / Auto Farm", _G.AutoFarmKeybind, function(k) _G.AutoFarmKeybind = k end)
-makeKeybindRow(ConfigScroll, 4, "Rune Farm", _G.RuneFarmKeybind, function(k) _G.RuneFarmKeybind = k end)
-makeKeybindRow(ConfigScroll, 5, "Button Farm", _G.ButtonFarmKeybind, function(k) _G.ButtonFarmKeybind = k end)
-makeKeybindRow(ConfigScroll, 6, "Auto Progress", _G.AutoProgressKeybind, function(k) _G.AutoProgressKeybind = k end)
-
--- Teleport Hotkeys
-make("TextLabel", ConfigScroll, {
-    Name = "TPHotkeyHeader",
-    Size = UDim2.new(1, -12, 0, 24),
-    LayoutOrder = 7,
-    BackgroundTransparency = 1,
-    Text = "Teleport Hotkeys",
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 13,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-
-makeKeybindRow(ConfigScroll, 8, "Roll Teleport", _G.TpRollKeybind, function(k) _G.TpRollKeybind = k end)
-makeKeybindRow(ConfigScroll, 9, "Rebirth Teleport", _G.TpRebirthKeybind, function(k) _G.TpRebirthKeybind = k end)
-makeKeybindRow(ConfigScroll, 10, "Clover World Teleport", _G.TpCloverKeybind, function(k) _G.TpCloverKeybind = k end)
-makeKeybindRow(ConfigScroll, 11, "Base Luck Teleport", _G.TpBaseLuckKeybind, function(k) _G.TpBaseLuckKeybind = k end)
-
--- General
-make("TextLabel", ConfigScroll, {
-    Name = "GeneralHotkeyHeader",
-    Size = UDim2.new(1, -12, 0, 24),
-    LayoutOrder = 12,
-    BackgroundTransparency = 1,
-    Text = "General",
-    TextColor3 = C.ACCENT_PURPLE,
-    Font = Enum.Font.GothamBold,
-    TextSize = 13,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    TextYAlignment = Enum.TextYAlignment.Center,
-})
-
-makeKeybindRow(ConfigScroll, 13, "GUI Toggle", _G.GuiToggleKeybind, function(k) _G.GuiToggleKeybind = k end)
+addConfigKeybind("Clover Farm Key",     _G.FarmKeybind,          function(k) _G.FarmKeybind = k end)
+addConfigKeybind("Touch Farm Key",      _G.AutoFarmKeybind,      function(k) _G.AutoFarmKeybind = k end)
+addConfigKeybind("Rune Farm Key",       _G.RuneFarmKeybind,      function(k) _G.RuneFarmKeybind = k end)
+addConfigKeybind("Button Farm Key",     _G.ButtonFarmKeybind,    function(k) _G.ButtonFarmKeybind = k end)
+addConfigKeybind("Auto Progress Key",   _G.AutoProgressKeybind,  function(k) _G.AutoProgressKeybind = k end)
+addConfigKeybind("TP: Roll",            _G.TpRollKeybind,        function(k) _G.TpRollKeybind = k end)
+addConfigKeybind("TP: Rebirth",         _G.TpRebirthKeybind,     function(k) _G.TpRebirthKeybind = k end)
+addConfigKeybind("TP: Clover World",    _G.TpCloverKeybind,      function(k) _G.TpCloverKeybind = k end)
+addConfigKeybind("TP: Base Luck",       _G.TpBaseLuckKeybind,    function(k) _G.TpBaseLuckKeybind = k end)
 
 -- ─────────────────────────────────────────────────────────────────
 -- 10. TP TAB — dropdown-style teleport list
@@ -2280,7 +2283,7 @@ local function tpToInstance(inst)
     end)
 end
 
--- Builds one teleport row: click anywhere = teleport
+-- Builds one dropdown-style row: click = teleport
 local function makeTPRow(order, label, onTeleport)
     local row = make("Frame", TPScroll, {
         Name             = "TPRow_" .. tostring(order),
@@ -2293,7 +2296,7 @@ local function makeTPRow(order, label, onTeleport)
     stroke(row, 1, C.BORDER_GLOW, 0.55)
 
     make("TextLabel", row, {
-        Size             = UDim2.new(1, -20, 1, 0),
+        Size             = UDim2.new(1, -12, 1, 0),
         Position         = UDim2.new(0, 12, 0, 0),
         BackgroundTransparency = 1,
         Text             = label,
